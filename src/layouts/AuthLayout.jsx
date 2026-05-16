@@ -1,5 +1,5 @@
 import { Outlet } from "react-router-dom";
-import LoginBanner from "../components/login/LoginBanner";
+import LoginBanner from "../components/login/Loginbanner";
 
 export default function AuthLayout() {
   return (
