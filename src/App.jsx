@@ -19,6 +19,7 @@ const Sale = React.lazy(() => import("./pages/Sale"));
 const Analytic = React.lazy(() => import("./pages/Analytic"));
 const Chat = React.lazy(() => import("./pages/Chat"));
 const ProductDetail = React.lazy(() => import("./pages/ProductDetail")); // Tambahkan ini
+const FiturBaru = React.lazy(() => import("./pages/FiturBaru"));
 
 function App() {
   return (
@@ -28,6 +29,7 @@ function App() {
           {/* Rute Halaman Utama */}
           <Route element={<MainLayout />}>
             <Route path="/" element={<Dashboard />} />
+            <Route path="/fitur-baru" element={<FiturBaru />} />
             <Route path="/product" element={<Product />} />
             <Route path="/product/:id" element={<ProductDetail />} />
             <Route path="/chat" element={<Chat />} />

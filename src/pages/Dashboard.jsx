@@ -5,7 +5,7 @@ import { FiBriefcase, FiFileText, FiUsers, FiDollarSign } from "react-icons/fi";
 import StatCard from "../components/StatCard";
 import VisitorCard from "../components/VisitorCard";
 import StatsSummaryBar from "../components/StatsSummaryBar";
-import MonthlyBarChart from "../components/Monthlybarchart";
+import MonthlyBarChart from "../components/MonthlyBarChart";
 import UserProfileChart from "../components/Userprofilechart";
 import StatisticWeeklyCard from "../components/StatisticWeeklyCard";
 import RightSidebar from "../components/RightSidebar";

@@ -9,6 +9,7 @@ import {
   BookMarked,
   BadgeDollarSign,
   CreditCard,
+  Sparkles,
 } from 'lucide-react';
 
 import LogoImage from '../assets/logoproject.png'; 
@@ -27,6 +28,7 @@ const menuItems = [
   { icon: BookMarked,      path: '/analytic' },  
   { icon: BadgeDollarSign, path: '/review' },    
   { icon: CreditCard,      path: '/payment' },
+  { icon: Sparkles,        path: '/fitur-baru' },
 ];
 
 const Sidebar = () => {
