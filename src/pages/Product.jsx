@@ -46,8 +46,8 @@ export default function Product() {
                 <tr key={index} className="hover:bg-gray-50 transition-colors">
                   <td className="py-4 font-bold text-gray-400">#{product.id}</td>
                   <td className="py-4">
-                    <img 
-                      src={product.image} 
+                    <img
+                      src={product.image}
                       alt={product.title}
                       className="w-12 h-12 rounded-lg object-cover shadow-sm border border-gray-100"
                     />
@@ -70,11 +70,10 @@ export default function Product() {
                   </td>
                   <td className="py-4">
                     <span
-                      className={`px-3 py-1 rounded-full text-[10px] font-extrabold uppercase ${
-                        product.stock > 20
+                      className={`px-3 py-1 rounded-full text-[10px] font-extrabold uppercase ${product.stock > 20
                           ? "bg-green-100 text-green-600"
                           : "bg-red-100 text-red-600"
-                      }`}
+                        }`}
                     >
                       {product.stock} units
                     </span>

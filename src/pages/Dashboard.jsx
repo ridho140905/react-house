@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { FiBriefcase, FiFileText, FiUsers, FiDollarSign } from "react-icons/fi";
 
 // Import Komponen
@@ -19,12 +19,31 @@ const summaryCards = [
 ];
 
 const Dashboard = () => {
+  // --- PENERAPAN useEffect (dan useState) ---
+  const [currentTime, setCurrentTime] = useState(new Date().toLocaleTimeString('id-ID'));
+
+  useEffect(() => {
+    // Fungsi ini berjalan saat komponen dimuat, memperbarui jam setiap 1 detik
+    const timerId = setInterval(() => {
+      setCurrentTime(new Date().toLocaleTimeString('id-ID'));
+    }, 1000);
+
+    // Cleanup: Menghentikan interval saat pindah dari halaman Dashboard
+    return () => clearInterval(timerId);
+  }, []);
+
   return (
     <div className="flex -mx-8 -my-8 min-h-screen bg-[#FBFBFB]">
 
       {/* AREA KIRI: Konten Utama */}
       <div className="flex-1 p-8 space-y-6 overflow-y-auto">
-        <h1 className="text-2xl font-bold text-gray-800 font-['Cairo']">Dashboard</h1>
+        <div className="flex justify-between items-center">
+          <h1 className="text-2xl font-bold text-gray-800 font-['Cairo']">Dashboard</h1>
+          <div className="bg-purple-50 border border-purple-100 text-purple-700 px-4 py-2 rounded-xl font-bold text-sm shadow-sm flex items-center space-x-2">
+            <span>Waktu:</span>
+            <span>{currentTime}</span>
+          </div>
+        </div>
 
         {/* Row 1: 4 StatCard (2x2) + VisitorCard */}
         <div className="grid grid-cols-3 gap-6">
