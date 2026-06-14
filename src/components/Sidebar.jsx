@@ -10,6 +10,7 @@ import {
   BadgeDollarSign,
   CreditCard,
   Sparkles,
+  Users,
 } from 'lucide-react';
 
 import LogoImage from '../assets/logoproject.png'; 
@@ -29,6 +30,7 @@ const menuItems = [
   { icon: BadgeDollarSign, path: '/review' },    
   { icon: CreditCard,      path: '/payment' },
   { icon: Sparkles,        path: '/fitur-baru' },
+  { icon: Users,           path: '/user' },
 ];
 
 const Sidebar = () => {

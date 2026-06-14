@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import {
   FaBox,
   FaBarcode,
@@ -6,6 +6,7 @@ import {
   FaDollarSign,
   FaWarehouse,
   FaEye, // Ikon mata untuk detail
+  FaSearch, // Ikon pencarian
 } from "react-icons/fa";
 import PageHeader from "../components/Page.Header";
 import { dataProducts } from "../data/product"; // Pastikan data furniture ada di sini
@@ -13,16 +14,49 @@ import { Link } from "react-router-dom";
 
 export default function Product() {
   const [isFormOpen, setIsFormOpen] = useState(false);
+  
+  // --- PENERAPAN useState ---
+  const [searchKeyword, setSearchKeyword] = useState("");
+
+  // --- PENERAPAN useRef ---
+  const titleInputRef = useRef(null);
+
+  // Efek samping untuk otomatis fokus input menggunakan useRef
+  useEffect(() => {
+    if (isFormOpen) {
+      // Tunggu sebentar sampai modal benar-benar di-render, lalu fokuskan
+      setTimeout(() => {
+        titleInputRef.current?.focus();
+      }, 100);
+    }
+  }, [isFormOpen]);
+
+  // Logika Filter Produk dengan state searchKeyword
+  const filteredProducts = dataProducts.filter((product) =>
+    product.title.toLowerCase().includes(searchKeyword.toLowerCase())
+  );
 
   return (
     <div id="product-container" className="pb-10 relative">
       <PageHeader title="Furniture List" breadcrumb={["Dashboard", "Products"]}>
-        <button
-          onClick={() => setIsFormOpen(true)}
-          className="bg-hijau text-white px-5 py-2 rounded-lg hover:bg-green-600 shadow-sm font-semibold transition-all"
-        >
-          + Add Product
-        </button>
+        <div className="flex items-center space-x-4">
+          <div className="relative">
+            <input 
+              type="text" 
+              placeholder="Search product..." 
+              value={searchKeyword}
+              onChange={(e) => setSearchKeyword(e.target.value)}
+              className="pl-9 pr-4 py-2 border border-gray-200 rounded-lg text-sm outline-none focus:border-hijau shadow-sm w-64 transition-all"
+            />
+            <FaSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 text-xs" />
+          </div>
+          <button
+            onClick={() => setIsFormOpen(true)}
+            className="bg-hijau text-white px-5 py-2 rounded-lg hover:bg-green-600 shadow-sm font-semibold transition-all"
+          >
+            + Add Product
+          </button>
+        </div>
       </PageHeader>
 
       {/* TABEL DATA PRODUCTS */}
@@ -42,12 +76,13 @@ export default function Product() {
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-50">
-              {dataProducts.map((product, index) => (
-                <tr key={index} className="hover:bg-gray-50 transition-colors">
-                  <td className="py-4 font-bold text-gray-400">#{product.id}</td>
+              {filteredProducts.length > 0 ? (
+                filteredProducts.map((product, index) => (
+                  <tr key={index} className="hover:bg-gray-50 transition-colors">
+                    <td className="py-4 font-bold text-gray-400">#{product.id}</td>
                   <td className="py-4">
-                    <img
-                      src={product.image}
+                    <img 
+                      src={product.image} 
                       alt={product.title}
                       className="w-12 h-12 rounded-lg object-cover shadow-sm border border-gray-100"
                     />
@@ -70,10 +105,11 @@ export default function Product() {
                   </td>
                   <td className="py-4">
                     <span
-                      className={`px-3 py-1 rounded-full text-[10px] font-extrabold uppercase ${product.stock > 20
+                      className={`px-3 py-1 rounded-full text-[10px] font-extrabold uppercase ${
+                        product.stock > 20
                           ? "bg-green-100 text-green-600"
                           : "bg-red-100 text-red-600"
-                        }`}
+                      }`}
                     >
                       {product.stock} units
                     </span>
@@ -88,7 +124,14 @@ export default function Product() {
                     </Link>
                   </td>
                 </tr>
-              ))}
+              ))
+              ) : (
+                <tr>
+                  <td colSpan="8" className="py-8 text-center text-gray-400">
+                    Product not found.
+                  </td>
+                </tr>
+              )}
             </tbody>
           </table>
         </div>
@@ -100,7 +143,13 @@ export default function Product() {
           <div className="bg-white p-6 rounded-xl w-full max-w-md shadow-2xl">
             <h2 className="text-xl font-bold mb-4">Add New Furniture</h2>
             <form className="flex flex-col space-y-3">
-              <input type="text" placeholder="Furniture Title" className="border p-2 rounded-md outline-none focus:border-hijau" />
+              {/* Tambahkan ref ke input pertama ini */}
+              <input 
+                ref={titleInputRef}
+                type="text" 
+                placeholder="Furniture Title" 
+                className="border p-2 rounded-md outline-none focus:border-hijau" 
+              />
               <input type="text" placeholder="Code" className="border p-2 rounded-md outline-none focus:border-hijau" />
               <input type="text" placeholder="Category" className="border p-2 rounded-md outline-none focus:border-hijau" />
               <input type="number" placeholder="Price" className="border p-2 rounded-md outline-none focus:border-hijau" />

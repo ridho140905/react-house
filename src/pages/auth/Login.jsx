@@ -1,4 +1,5 @@
 import { useState } from "react";
+import bcrypt from "bcryptjs";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { BsFillExclamationDiamondFill } from "react-icons/bs";
@@ -7,6 +8,9 @@ import LoginInput from "../../components/login/Logininput";
 import LoginButton from "../../components/login/Loginbutton";
 import LoginDivider from "../../components/login/Logindivider";
 import SocialLoginButton from "../../components/login/Socialloginbutton";
+
+const API_URL = "https://ldjlujubthlehyhruqfp.supabase.co/rest/v1/users";
+const API_KEY = "sb_publishable_Ax35tbMkLxWTxZF1H0jddA_kwjDao2g";
 
 export default function Login() {
   const navigate = useNavigate();
@@ -24,19 +28,45 @@ export default function Login() {
     setLoading(true);
     setError("");
 
-    if (dataForm.email === "ridho" && dataForm.password === "123") {
-      setTimeout(() => { setLoading(false); navigate("/"); }, 1000);
-      return;
-    }
+    try {
+      // Ambil user berdasarkan email dari Supabase
+      const response = await axios.get(
+        `${API_URL}?email=eq.${encodeURIComponent(dataForm.email)}&select=*`,
+        {
+          headers: {
+            apikey: API_KEY,
+            Authorization: `Bearer ${API_KEY}`,
+            "Content-Type": "application/json",
+          },
+        }
+      );
 
-    axios
-      .post("https://dummyjson.com/user/login", {
-        username: dataForm.email,
-        password: dataForm.password,
-      })
-      .then((res) => { if (res.status === 200) navigate("/"); else setError(res.data.message); })
-      .catch((err) => setError(err.response?.data?.message || err.message || "An unknown error occurred"))
-      .finally(() => setLoading(false));
+      const users = response.data;
+
+      if (!users || users.length === 0) {
+        setError("Email tidak ditemukan. Silakan periksa kembali.");
+        return;
+      }
+
+      const user = users[0];
+
+      // Verifikasi password dengan bcrypt
+      const isPasswordMatch = await bcrypt.compare(dataForm.password, user.password);
+
+      if (!isPasswordMatch) {
+        setError("Password salah. Silakan coba lagi.");
+        return;
+      }
+
+      // Login berhasil — simpan info user ke localStorage
+      localStorage.setItem("user", JSON.stringify({ id: user.id, name: user.name, email: user.email, role: user.role }));
+      navigate("/");
+
+    } catch (err) {
+      setError(err.response?.data?.message || err.message || "Terjadi kesalahan. Silakan coba lagi.");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -44,7 +74,7 @@ export default function Login() {
       {/* Header */}
       <div className="text-center mb-8">
         <h1 className="text-3xl font-bold text-gray-900 tracking-wide mb-2">LOGIN</h1>
-        <p className="text-sm text-gray-400">How to i get started lorem ipsum dolor at?</p>
+        <p className="text-sm text-gray-400">Masuk ke akun Anda untuk melanjutkan</p>
       </div>
 
       {/* Error */}
@@ -65,7 +95,7 @@ export default function Login() {
 
       {/* Form */}
       <form onSubmit={handleSubmit} className="space-y-4">
-        <LoginInput type="text" name="email" placeholder="Username" icon="user" value={dataForm.email} onChange={handleChange} />
+        <LoginInput type="text" name="email" placeholder="Email Address" icon="user" value={dataForm.email} onChange={handleChange} />
         <LoginInput type="password" name="password" placeholder="Password" icon="lock" value={dataForm.password} onChange={handleChange} />
         <div className="pt-1">
           <LoginButton label={loading ? "Loading..." : "Login Now"} type="submit" fullWidth disabled={loading} />
