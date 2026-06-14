@@ -73,8 +73,14 @@ export default function Login() {
       // Login berhasil — simpan info user ke localStorage
       localStorage.setItem("user", JSON.stringify({ id: user.id, name: user.name, email: user.email, role: user.role }));
       
-      // Mengarahkan ke halaman dashboard utama
-      navigate("/dashboard");
+      // Mengarahkan ke halaman yang sesuai berdasarkan role
+      const userRole = user.role ? user.role.toLowerCase() : "";
+      if (userRole === "guest") {
+        navigate("/guest-dashboard");
+      } else {
+        // Default ke dashboard (termasuk role admin)
+        navigate("/dashboard");
+      }
 
     } catch (err) {
       setError(err.response?.data?.message || err.message || "Terjadi kesalahan. Silakan coba lagi.");

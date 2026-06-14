@@ -21,6 +21,8 @@ const Chat = React.lazy(() => import("./pages/Chat"));
 const User = React.lazy(() => import("./pages/User"));
 const ProductDetail = React.lazy(() => import("./pages/ProductDetail")); // Tambahkan ini
 const FiturBaru = React.lazy(() => import("./pages/FiturBaru"));
+const GuestDashboard = React.lazy(() => import("./pages/GuestDashboard"));
+const GuestLayout = React.lazy(() => import("./layouts/GuestLayout"));
 
 function App() {
   return (
@@ -87,6 +89,11 @@ function App() {
                 />
               }
             />
+          </Route>
+
+          {/* Rute Guest */}
+          <Route element={<GuestLayout />}>
+            <Route path="/guest-dashboard" element={<GuestDashboard />} />
           </Route>
 
           {/* Rute Autentikasi */}
