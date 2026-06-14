@@ -1,7 +1,7 @@
 import { useState } from "react";
 import bcrypt from "bcryptjs";
 import axios from "axios";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { BsFillExclamationDiamondFill } from "react-icons/bs";
 import { ImSpinner2 } from "react-icons/im";
 import LoginInput from "../../components/login/Logininput";
@@ -29,6 +29,9 @@ export default function Login() {
     setError("");
 
     try {
+      // Membersihkan sisa session lama sebelum membuat yang baru
+      localStorage.removeItem("user");
+
       // Ambil user berdasarkan email dari Supabase
       const response = await axios.get(
         `${API_URL}?email=eq.${encodeURIComponent(dataForm.email)}&select=*`,
@@ -49,9 +52,18 @@ export default function Login() {
       }
 
       const user = users[0];
+      const storedPassword = user?.password;
 
-      // Verifikasi password dengan bcrypt
-      const isPasswordMatch = await bcrypt.compare(dataForm.password, user.password);
+      if (storedPassword == null) {
+        setError("Password pengguna tidak tersedia. Hubungi admin atau periksa data Supabase.");
+        return;
+      }
+
+      const normalizedPassword = typeof storedPassword === "number" ? String(storedPassword) : storedPassword;
+      const usesBcryptHash = typeof normalizedPassword === "string" && /^\$2[aby]\$/.test(normalizedPassword);
+      const isPasswordMatch = usesBcryptHash
+        ? await bcrypt.compare(dataForm.password, normalizedPassword)
+        : dataForm.password === normalizedPassword;
 
       if (!isPasswordMatch) {
         setError("Password salah. Silakan coba lagi.");
@@ -60,7 +72,9 @@ export default function Login() {
 
       // Login berhasil — simpan info user ke localStorage
       localStorage.setItem("user", JSON.stringify({ id: user.id, name: user.name, email: user.email, role: user.role }));
-      navigate("/");
+      
+      // Mengarahkan ke halaman dashboard utama
+      navigate("/dashboard");
 
     } catch (err) {
       setError(err.response?.data?.message || err.message || "Terjadi kesalahan. Silakan coba lagi.");
@@ -100,6 +114,12 @@ export default function Login() {
         <div className="pt-1">
           <LoginButton label={loading ? "Loading..." : "Login Now"} type="submit" fullWidth disabled={loading} />
         </div>
+        <p className="text-center text-sm text-gray-500 mt-2">
+          Belum punya akun?{' '}
+          <Link to="/register" className="font-semibold text-[#5D5FEF] hover:text-[#4a4cc7]">
+            Daftar di sini
+          </Link>
+        </p>
         <LoginDivider />
         <SocialLoginButton provider="google" />
         <SocialLoginButton provider="facebook" />

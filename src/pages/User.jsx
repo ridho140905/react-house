@@ -60,11 +60,22 @@ export default function User() {
             setError("");
             setSuccess("");
 
+            const payload = { ...formData };
+            if (payload.password) {
+                const passwordValue = typeof payload.password === "string" ? payload.password : String(payload.password);
+                payload.password = /^\$2[aby]\$/.test(passwordValue)
+                    ? passwordValue
+                    : bcrypt.hashSync(passwordValue, 10);
+            }
+            if (editingId && !payload.password) {
+                delete payload.password;
+            }
+
             if (editingId) {
-                await userAPI.updateUser(editingId, formData);
+                await userAPI.updateUser(editingId, payload);
                 showMessage(setSuccess, "Data pengguna berhasil diperbarui!");
             } else {
-                await userAPI.createUser(formData);
+                await userAPI.createUser(payload);
                 showMessage(setSuccess, "Pengguna baru berhasil ditambahkan!");
             }
 

@@ -1,6 +1,6 @@
 import React, { Suspense } from "react";
 import "./assets/tailwind.css";
-import { Route, Routes } from "react-router-dom";
+import { Navigate, Route, Routes } from "react-router-dom";
 import Loading from "./components/Loading";
 import Review from "./pages/Review";
 
@@ -27,9 +27,12 @@ function App() {
     <>
       <Suspense fallback={<Loading />}>
         <Routes>
+          {/* Redirect root ke login */}
+          <Route path="/" element={<Navigate to="/login" replace />} />
+
           {/* Rute Halaman Utama */}
           <Route element={<MainLayout />}>
-            <Route path="/" element={<Dashboard />} />
+            <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/fitur-baru" element={<FiturBaru />} />
             <Route path="/product" element={<Product />} />
             <Route path="/product/:id" element={<ProductDetail />} />

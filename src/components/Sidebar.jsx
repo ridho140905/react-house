@@ -21,14 +21,12 @@ const INACTIVE_COLOR = "#D1D5DB";
 
 // BAGIAN INI YANG KITA SESUAIKAN DENGAN App.jsx KAMU
 const menuItems = [
-  { icon: Home,            path: '/' },          
+  { icon: Home,            path: '/dashboard' },          
   { icon: Mail,            path: '/chat' },      
-  { icon: Smartphone,      path: '/product' },   // UBAH INI JADI /product agar saat ikon hp diklik, tabel furniture muncul
+  { icon: Smartphone,      path: '/product' }, 
   { icon: Coins,           path: '/sale' },      
-  { icon: LayoutGrid,      path: '/product' },   // Ikon kotak juga ke /product
   { icon: BookMarked,      path: '/analytic' },  
   { icon: BadgeDollarSign, path: '/review' },    
-  { icon: CreditCard,      path: '/payment' },
   { icon: Sparkles,        path: '/fitur-baru' },
   { icon: Users,           path: '/user' },
 ];
