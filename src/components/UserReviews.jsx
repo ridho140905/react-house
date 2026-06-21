@@ -1,23 +1,9 @@
 import React from "react";
 import { FiStar, FiArrowRight } from "react-icons/fi";
+import { reviewData } from "../data/reviewData";
+
 const UserReviews = () => {
-  const reviews = [
-    {
-      name: "Belle Epoque",
-      rating: 4,
-      text: "Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium.",
-    },
-    {
-      name: "Nagita Almania",
-      rating: 4,
-      text: "Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium.",
-    },
-    {
-      name: "Esmeralda Striff",
-      rating: 4,
-      text: "Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium.",
-    },
-  ];
+  const reviews = reviewData.filter(rev => rev.status === "Approved").slice(0, 3);
 
   return (
     <section className="mt-8">
@@ -45,8 +31,8 @@ const UserReviews = () => {
                   {rev.name}
                 </span>
               </div>
-              <p className="text-xs text-gray-400 leading-relaxed">
-                {rev.text}
+              <p className="text-xs text-gray-400 leading-relaxed line-clamp-2">
+                {rev.comment}
               </p>
             </div>
           ))}

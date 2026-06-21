@@ -22,7 +22,7 @@ const ContactUs = () => {
             <div className="space-y-5">
               <div className="flex items-start gap-4 text-gray-600">
                 <FiMapPin className="w-6 h-6 text-[#4F45B6] shrink-0 mt-0.5" />
-                <span>Jl. Desain Interior No. 124, Kota Kreatif, Indonesia</span>
+                <span>Jl. Soekarno Hatta No. 236, Pekanbaru, Riau</span>
               </div>
               <div className="flex items-center gap-4 text-gray-600">
                 <FiPhone className="w-5 h-5 text-[#4F45B6] shrink-0" />
@@ -39,10 +39,16 @@ const ContactUs = () => {
             </div>
           </div>
           
-          <div className="bg-[#F4F2FF] p-8 rounded-3xl border border-[#E0DDF7] flex flex-col items-center justify-center text-center py-12">
-             <FiMapPin className="w-8 h-8 text-[#4F45B6] mb-3" />
-             <h4 className="font-bold text-[#4F45B6] mb-1">Peta Outlet Pusat</h4>
-             <p className="text-sm text-[#4F45B6]/70">Gunakan navigasi Google Maps ke Antigravity</p>
+          <div className="bg-gray-100 rounded-3xl border border-gray-200 overflow-hidden h-64 relative">
+             <iframe 
+                src="https://maps.google.com/maps?q=Informa%20Pekanbaru&t=&z=15&ie=UTF8&iwloc=&output=embed" 
+                width="100%" 
+                height="100%" 
+                style={{ border: 0 }} 
+                allowFullScreen="" 
+                loading="lazy"
+                title="Peta Lokasi Toko"
+              ></iframe>
           </div>
         </div>
 

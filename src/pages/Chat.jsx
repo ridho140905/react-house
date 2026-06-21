@@ -43,9 +43,9 @@ export default function Chat() {
   };
 
   const chatList = [
-    { id: 1, name: "Rizky Ridho", time: "10:35 AM", lastMsg: "Apakah meja ready?", avatar: "https://avatar.iran.liara.run/public/boy?username=Rizky" },
-    { id: 2, name: "Siti Aminah", time: "09:12 AM", lastMsg: "Terima kasih barangnya sudah sampai", avatar: "https://avatar.iran.liara.run/public/girl?username=Siti" },
-    { id: 3, name: "Budi Santoso", time: "Yesterday", lastMsg: "Kapan restock standing lamp?", avatar: "https://avatar.iran.liara.run/public/boy?username=Budi" },
+    { id: 1, name: "Rizky Ridho", time: "10:35 AM", lastMsg: "Apakah meja ready?", avatar: "https://i.pravatar.cc/150?img=11" },
+    { id: 2, name: "Siti Aminah", time: "09:12 AM", lastMsg: "Terima kasih barangnya sudah sampai", avatar: "https://i.pravatar.cc/150?img=5" },
+    { id: 3, name: "Budi Santoso", time: "Yesterday", lastMsg: "Kapan restock standing lamp?", avatar: "https://i.pravatar.cc/150?img=13" },
   ];
 
   // Filter pesan yang sesuai dengan chat aktif

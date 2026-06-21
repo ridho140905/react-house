@@ -11,6 +11,9 @@ import {
   CreditCard,
   Sparkles,
   Users,
+  ShoppingBag,
+  Award,
+  Wrench
 } from 'lucide-react';
 
 import LogoImage from '../assets/logoproject.png'; 
@@ -22,13 +25,14 @@ const INACTIVE_COLOR = "#D1D5DB";
 // BAGIAN INI YANG KITA SESUAIKAN DENGAN App.jsx KAMU
 const menuItems = [
   { icon: Home,            path: '/dashboard' },          
-  { icon: Mail,            path: '/chat' },      
+  { icon: ShoppingBag,     path: '/orders' },
+  { icon: Users,           path: '/user' },
+  { icon: Award,           path: '/membership-admin' },
+  { icon: Wrench,          path: '/warranty-admin' },
   { icon: Smartphone,      path: '/product' }, 
-  { icon: Coins,           path: '/sale' },      
-  { icon: BookMarked,      path: '/analytic' },  
+  { icon: Mail,            path: '/chat' },      
   { icon: BadgeDollarSign, path: '/review' },    
   { icon: Sparkles,        path: '/fitur-baru' },
-  { icon: Users,           path: '/user' },
 ];
 
 const Sidebar = () => {

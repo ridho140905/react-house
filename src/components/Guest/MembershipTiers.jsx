@@ -1,49 +1,27 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { FiCheckCircle, FiStar, FiAward, FiShield } from 'react-icons/fi';
+import { useNavigate } from 'react-router-dom';
+import { membershipTiers } from '../../data/membershipData';
 
 const MembershipTiers = () => {
-  const tiers = [
-    {
-      name: 'Silver',
-      pts: '0 - 5.000 Pts',
-      icon: <FiStar className="w-8 h-8 text-gray-400" />,
-      color: 'bg-gray-100 text-gray-800',
-      border: 'border-gray-200',
-      perks: [
-        'Cashback 2% setiap transaksi',
-        'Layanan garansi standar',
-        'Akses promo reguler tahunan'
-      ]
-    },
-    {
-      name: 'Gold',
-      pts: '5.001 - 15.000 Pts',
-      icon: <FiAward className="w-8 h-8 text-yellow-500" />,
-      color: 'bg-yellow-50 text-yellow-800',
-      border: 'border-yellow-200 ring-2 ring-yellow-400 scale-105 shadow-xl z-10',
-      isPopular: true,
-      perks: [
-        'Cashback 5% setiap transaksi',
-        'Prioritas pengiriman (H+1)',
-        'Gratis 1x Konsultasi Interior/tahun',
-        'Akses produk pre-launch'
-      ]
-    },
-    {
-      name: 'Platinum',
-      pts: '> 15.000 Pts',
-      icon: <FiShield className="w-8 h-8 text-purple-600" />,
-      color: 'bg-purple-50 text-purple-800',
-      border: 'border-purple-200',
-      perks: [
-        'Cashback 10% setiap transaksi',
-        'Gratis Ongkir Nasional',
-        'VIP Support 24/7',
-        'Konsultasi Interior Unlimited',
-        'Hadiah eksklusif ulang tahun'
-      ]
+  const navigate = useNavigate();
+  const [selectedTierId, setSelectedTierId] = useState(null);
+
+  useEffect(() => {
+    const savedTier = localStorage.getItem("selectedTier");
+    if (savedTier) {
+      setSelectedTierId(savedTier);
     }
-  ];
+  }, []);
+
+  const getTierIcon = (id) => {
+    switch(id) {
+      case 'tier-1': return <FiStar className="w-8 h-8 text-gray-400" />;
+      case 'tier-2': return <FiAward className="w-8 h-8 text-yellow-500" />;
+      case 'tier-3': return <FiShield className="w-8 h-8 text-purple-600" />;
+      default: return <FiStar className="w-8 h-8 text-gray-400" />;
+    }
+  };
 
   return (
     <div className="space-y-12">
@@ -58,35 +36,68 @@ const MembershipTiers = () => {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-8 py-8 items-center">
-        {tiers.map((tier, index) => (
-          <div key={index} className={`relative bg-white rounded-3xl border p-8 flex flex-col h-full transition-all duration-300 hover:shadow-lg ${tier.border}`}>
-            {tier.isPopular && (
-              <div className="absolute -top-4 left-1/2 -translate-x-1/2 bg-gradient-to-r from-yellow-400 to-yellow-500 text-white text-xs font-black px-4 py-1.5 rounded-full uppercase tracking-wider shadow-sm">
-                Paling Diminati
+        {membershipTiers.map((tier) => {
+          // Jika user sudah memilih tier, maka highlight tier tersebut
+          const isMyTier = selectedTierId === tier.id;
+
+          // Coba ambil styling dari data atau fallback
+          let borderClass = 'border-gray-200';
+          if (tier.id === 'tier-2') borderClass = 'border-yellow-200 ring-2 ring-yellow-400 shadow-xl';
+          if (tier.id === 'tier-3') borderClass = 'border-gray-800';
+          
+          if (isMyTier) {
+            borderClass = 'border-[#4F45B6] ring-4 ring-[#4F45B6] shadow-2xl scale-105 z-10';
+          }
+
+          return (
+            <div key={tier.id} className={`relative bg-white rounded-3xl border p-8 flex flex-col h-full transition-all duration-300 hover:shadow-lg ${borderClass}`}>
+              {isMyTier ? (
+                <div className="absolute -top-4 left-1/2 -translate-x-1/2 bg-gradient-to-r from-[#4F45B6] to-[#3c348f] text-white text-xs font-black px-4 py-1.5 rounded-full uppercase tracking-wider shadow-sm">
+                  Paket Anda Saat Ini
+                </div>
+              ) : tier.isPopular ? (
+                <div className="absolute -top-4 left-1/2 -translate-x-1/2 bg-gradient-to-r from-yellow-400 to-yellow-500 text-white text-xs font-black px-4 py-1.5 rounded-full uppercase tracking-wider shadow-sm">
+                  Paling Diminati
+                </div>
+              ) : null}
+              
+              <div className={`w-16 h-16 rounded-2xl flex items-center justify-center mb-6 ${tier.color}`}>
+                {getTierIcon(tier.id)}
               </div>
-            )}
-            
-            <div className={`w-16 h-16 rounded-2xl flex items-center justify-center mb-6 ${tier.color}`}>
-              {tier.icon}
+              
+              <h3 className="text-2xl font-black text-gray-900 mb-1">{tier.name} Tier</h3>
+              <p className="text-sm font-bold text-gray-400 mb-8">{tier.pointMultiplier}</p>
+              
+              <ul className="space-y-4 mb-8 flex-1">
+                {tier.benefits.map((benefit, i) => (
+                  <li key={i} className="flex items-start">
+                    {benefit.included ? (
+                      <FiCheckCircle className="w-5 h-5 text-[#4F45B6] shrink-0 mr-3 mt-0.5" />
+                    ) : (
+                      <div className="w-5 h-5 rounded-full border-2 border-gray-200 shrink-0 mr-3 mt-0.5"></div>
+                    )}
+                    <span className={`text-sm ${benefit.included ? 'text-gray-600 font-medium' : 'text-gray-400'}`}>{benefit.text}</span>
+                  </li>
+                ))}
+              </ul>
+              
+              <button 
+                onClick={() => {
+                  if (isMyTier) {
+                    navigate('/my-membership');
+                  } else {
+                    navigate('/membership');
+                  }
+                }}
+                className={`w-full py-3 rounded-xl font-bold transition-colors mt-auto ${
+                  isMyTier ? 'bg-[#4F45B6] text-white hover:bg-[#3c348f]' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                }`}
+              >
+                {isMyTier ? 'Lihat Benefit Saya' : 'Pelajari Lebih Lanjut'}
+              </button>
             </div>
-            
-            <h3 className="text-2xl font-black text-gray-900 mb-1">{tier.name} Tier</h3>
-            <p className="text-sm font-bold text-gray-400 mb-8">{tier.pts}</p>
-            
-            <ul className="space-y-4 mb-8 flex-1">
-              {tier.perks.map((perk, i) => (
-                <li key={i} className="flex items-start">
-                  <FiCheckCircle className="w-5 h-5 text-[#4F45B6] shrink-0 mr-3 mt-0.5" />
-                  <span className="text-gray-600 font-medium">{perk}</span>
-                </li>
-              ))}
-            </ul>
-            
-            <button className={`w-full py-3 rounded-xl font-bold transition-colors mt-auto ${tier.isPopular ? 'bg-[#4F45B6] text-white hover:bg-[#3c348f]' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'}`}>
-              Pelajari Lebih Lanjut
-            </button>
-          </div>
-        ))}
+          );
+        })}
       </div>
     </div>
   );

@@ -2,7 +2,7 @@ import React from 'react';
 import { FiAward, FiTool } from 'react-icons/fi';
 
 import FurnitureList from '../components/Guest/FurnitureList';
-import CustomerOrders from '../components/Guest/CustomerOrders';
+import GuestTestimonial from '../components/Guest/GuestTestimonial';
 import CRMLoyaltyCard from '../components/Guest/CRMLoyaltyCard';
 import CRMTicketGaransi from '../components/Guest/CRMTicketGaransi';
 import CRMChatWidget from '../components/Guest/CRMChatWidget';
@@ -75,13 +75,9 @@ const GuestDashboard = () => {
           <FurnitureList />
         </section>
 
-        {/* SECTION: PESANAN SAYA */}
-        <section id="pesanan" className="scroll-mt-32">
-          <div className="mb-10">
-            <h2 className="text-3xl font-black text-gray-900 mb-2">Riwayat Pesanan</h2>
-            <p className="text-gray-500 text-lg">Pantau status pengiriman dari pembelian Anda sebelumnya.</p>
-          </div>
-          <CustomerOrders />
+        {/* SECTION: TESTIMONI (PENGGANTI PESANAN SAYA) */}
+        <section id="testimoni" className="scroll-mt-32">
+          <GuestTestimonial />
         </section>
 
         {/* SECTION: GARANSI */}

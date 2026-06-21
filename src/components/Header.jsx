@@ -131,7 +131,6 @@ export default function Header() {
                     />
                     <div className="hidden md:block text-left">
                         <p className="text-sm font-semibold text-gray-800 leading-none mb-1">{userData.name}</p>
-                        <p className="text-xs font-medium text-gray-400 capitalize leading-none">{userData.role}</p>
                     </div>
                 </div>
                 

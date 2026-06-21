@@ -1,17 +1,11 @@
 import { useState } from "react";
 import PageHeader from "../components/Page.Header";
 import { FaSearch, FaStar, FaCheck, FaTimes } from "react-icons/fa";
+import { reviewData } from "../data/reviewData";
 
 export default function Review() {
   const [searchTerm, setSearchTerm] = useState("");
   const [filterStatus, setFilterStatus] = useState("All");
-
-  const reviewData = [
-    { id: 1, name: "Budi Santoso", product: "Minimalist Stool", rating: 5, comment: "Kualitas sangat bagus dan sesuai dengan gambar.", date: "2026-05-02", status: "Approved" },
-    { id: 2, name: "Siti Aminah", product: "Floor Lamp", rating: 4, comment: "Desain elegan, pengiriman juga cepat.", date: "2026-05-01", status: "Approved" },
-    { id: 3, name: "Andi Wijaya", product: "Modern Sofa", rating: 5, comment: "Sangat puas, bahan sangat nyaman digunakan.", date: "2026-04-28", status: "Pending" },
-    { id: 4, name: "Linda Sari", product: "Wooden Cabinet", rating: 3, comment: "Bagus tapi ada sedikit goresan pada kayu.", date: "2026-04-25", status: "Approved" }
-  ];
 
   const filteredReviews = reviewData.filter(rev => {
     const matchesSearch = rev.name.toLowerCase().includes(searchTerm.toLowerCase()) || 
