@@ -48,7 +48,7 @@ export default function UserTable({ users, loading, actionLoading, onEdit, onDel
                                 <th className="px-6 py-4">Name</th>
                                 <th className="px-6 py-4">Email</th>
                                 <th className="px-6 py-4">Role</th>
-                                <th className="px-6 py-4">Password (Hash)</th>
+                                <th className="px-6 py-4">Password</th>
                                 <th className="px-6 py-4 text-center">Action</th>
                             </tr>
                         </thead>
