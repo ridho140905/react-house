@@ -3,34 +3,34 @@ import FurnitureCard from './FurnitureCard';
 
 const dummyData = [
   {
-    id: 1,
+    id: 'nordic-sofa',
     name: "Nordic Minimalist Sofa",
     description: "Sofa 3 dudukan dengan kain linen premium dan kaki kayu solid oak.",
-    price: "Rp 4.500.000",
+    price: 4500000,
     rating: 4.8,
     image: "https://images.unsplash.com/photo-1555041469-a586c61ea9bc?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80"
   },
   {
-    id: 2,
+    id: 'ergo-chair',
     name: "Ergo Lounge Chair",
     description: "Kursi santai ergonomis dengan bantalan busa memori tebal.",
-    price: "Rp 2.100.000",
+    price: 2100000,
     rating: 4.9,
     image: "https://images.unsplash.com/photo-1598300042247-d088f8ab3a91?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80"
   },
   {
-    id: 3,
+    id: 'oak-table',
     name: "Modern Oak Dining Table",
     description: "Meja makan kayu ek solid untuk 6 orang, desain elegan dan kokoh.",
-    price: "Rp 5.200.000",
+    price: 5200000,
     rating: 4.7,
     image: "https://images.unsplash.com/photo-1577140917170-285929fb55b7?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80"
   },
   {
-    id: 4,
+    id: 'tv-cabinet',
     name: "Aesthetic TV Cabinet",
     description: "Rak TV minimalis dengan kompartemen penyimpanan luas.",
-    price: "Rp 1.850.000",
+    price: 1850000,
     rating: 4.6,
     image: "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80"
   }

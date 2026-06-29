@@ -1,7 +1,15 @@
 import React from 'react';
 import { FiStar, FiShoppingCart } from 'react-icons/fi';
+import { useCart } from '../../contexts/CartContext';
 
 const FurnitureCard = ({ item }) => {
+  const { addToCart } = useCart();
+
+  const handleAddToCart = () => {
+    addToCart(item);
+    alert(`${item.name} berhasil ditambahkan ke keranjang!`);
+  };
+
   return (
     <div className="bg-white rounded-2xl shadow-sm hover:shadow-md transition-shadow duration-300 border border-gray-100 overflow-hidden flex flex-col group">
       {/* Image Container */}
@@ -25,9 +33,12 @@ const FurnitureCard = ({ item }) => {
         <div className="mt-auto flex items-center justify-between">
           <div className="flex flex-col">
             <span className="text-xs text-gray-400 uppercase tracking-wider">Harga</span>
-            <span className="text-xl font-extrabold text-[#4F45B6]">{item.price}</span>
+            <span className="text-xl font-extrabold text-[#4F45B6]">Rp {item.price.toLocaleString()}</span>
           </div>
-          <button className="bg-[#4F45B6] hover:bg-[#3c348f] text-white p-3 rounded-xl transition-colors shadow-sm hover:shadow-indigo-200">
+          <button 
+            onClick={handleAddToCart}
+            className="bg-[#4F45B6] hover:bg-[#3c348f] text-white p-3 rounded-xl transition-colors shadow-sm hover:shadow-indigo-200"
+          >
             <FiShoppingCart className="w-5 h-5" />
           </button>
         </div>

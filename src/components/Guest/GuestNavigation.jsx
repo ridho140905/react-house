@@ -1,42 +1,22 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect } from 'react';
 import { LogOut, LogIn, UserPlus, Gift } from 'lucide-react';
 import { useNavigate, Link } from 'react-router-dom';
 import ProfilePhoto from '../../assets/foto.jpeg'; 
 import LogoImage from '../../assets/logoproject.png';
+import { useAuth } from '../../contexts/AuthContext';
 
 const GuestNavigation = () => {
   const navigate = useNavigate();
+  const { user, profile, signOut } = useAuth();
   const EXACT_THEME_COLOR = "#4F45B6";
-  const [userData, setUserData] = useState(null);
-  const [isLoaded, setIsLoaded] = useState(false);
 
-  useEffect(() => {
-    const session = localStorage.getItem("user");
-    if (session) {
-      try {
-        setUserData(JSON.parse(session));
-      } catch (e) {
-        localStorage.removeItem("user");
-      }
-    }
-    // Set loaded true agar tidak stuck di animate-pulse kalau tidak ada session
-    setIsLoaded(true);
-  }, []);
-
-  const handleLogout = () => {
+  const handleLogout = async () => {
     const konfirmasi = window.confirm("Apakah Anda yakin ingin logout?");
     if (konfirmasi) {
-      localStorage.removeItem("user");
-      setUserData(null);
-      // Setelah logout dari Guest, biarkan mereka tetap di Guest (karena ini public)
-      // atau lempar ke login, tapi kita biarkan saja halamannya direfresh.
+      await signOut();
       navigate("/guest-dashboard");
     }
   };
-
-  if (!isLoaded) {
-    return <div className="h-20 bg-white border-b border-gray-100 w-full animate-pulse"></div>;
-  }
 
   const scrollToSection = (id) => {
     const element = document.getElementById(id);
@@ -69,19 +49,21 @@ const GuestNavigation = () => {
 
       {/* Kanan: Profile & Logout ATAU Login & Register */}
       <div className="flex items-center gap-4">
-        {userData ? (
+        {user ? (
           <>
             <Link 
-              to="/my-membership"
+              to={profile?.role === 'admin' ? "/admin-dashboard" : "/member-dashboard"}
               className="flex items-center gap-2 px-4 py-2 bg-[#F4F2FF] text-[#4F45B6] rounded-xl hover:bg-[#EBE9FE] transition-colors font-bold text-sm mr-2"
             >
               <Gift className="w-4 h-4" strokeWidth={2.5} />
-              <span className="hidden lg:inline">Klaim Benefit</span>
+              <span className="hidden lg:inline">Ke Dashboard</span>
             </Link>
 
             <div className="flex items-center gap-3 text-right">
               <div className="flex flex-col justify-center">
-                <span className="text-sm font-bold text-gray-900 leading-tight">{userData.name}</span>
+                <span className="text-sm font-bold text-gray-900 leading-tight">
+                  {profile?.full_name || user?.user_metadata?.full_name || "Pengguna"}
+                </span>
               </div>
               <div className="w-10 h-10 rounded-xl overflow-hidden shadow-sm border border-gray-100">
                 <img src={ProfilePhoto} alt="Profile" className="w-full h-full object-cover" />

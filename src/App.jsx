@@ -7,6 +7,7 @@ import ProtectedRoute from "./components/ProtectedRoute"; // Import ProtectedRou
 
 // Lazy imports disesuaikan dengan kebutuhan Furni House
 const MainLayout = React.lazy(() => import("./layouts/MainLayout"));
+const MemberLayout = React.lazy(() => import("./layouts/MemberLayout"));
 const AuthLayout = React.lazy(() => import("./layouts/AuthLayout"));
 const Dashboard = React.lazy(() => import("./pages/Dashboard"));
 const Product = React.lazy(() => import("./pages/Product"));
@@ -27,8 +28,9 @@ const ProductDetail = React.lazy(() => import("./pages/ProductDetail")); // Tamb
 const FiturBaru = React.lazy(() => import("./pages/FiturBaru"));
 const GuestDashboard = React.lazy(() => import("./pages/GuestDashboard"));
 const GuestLayout = React.lazy(() => import("./layouts/GuestLayout"));
-const Membership = React.lazy(() => import("./pages/Membership")); // Halaman Membership Baru
-const MyMembership = React.lazy(() => import("./pages/MyMembership")); // Halaman Klaim Membership
+const Membership = React.lazy(() => import("./pages/Membership")); 
+const MyMembership = React.lazy(() => import("./pages/MyMembership")); 
+const MemberDashboard = React.lazy(() => import("./pages/MemberDashboard"));
 
 function App() {
   return (
@@ -51,8 +53,8 @@ function App() {
           {/* =========================================
               2. JALUR PROTEKSI (Harus Login Dulu)
               ========================================= */}
-          {/* Gunakan komponen ProtectedRoute untuk membungkus MainLayout */}
           <Route element={<ProtectedRoute />}>
+            {/* Layout khusus Admin (Sidebar + Navigation) */}
             <Route element={<MainLayout />}>
               <Route path="/dashboard" element={<Dashboard />} />
               <Route path="/fitur-baru" element={<FiturBaru />} />
@@ -66,6 +68,11 @@ function App() {
               <Route path="/warranty-admin" element={<WarrantyAdmin />} />
               <Route path="/review" element={<Review />} />
               <Route path="/user" element={<User />} />
+            </Route>
+
+            {/* Layout khusus Member (Hanya Navigation atas, tanpa Sidebar Admin) */}
+            <Route element={<MemberLayout />}>
+              <Route path="/member-dashboard" element={<MemberDashboard />} />
             </Route>
           </Route>
 

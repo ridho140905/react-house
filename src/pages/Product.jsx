@@ -1,39 +1,116 @@
 import { useState, useRef, useEffect } from "react";
-import {
-  FaBox,
-  FaBarcode,
-  FaTag,
-  FaDollarSign,
-  FaWarehouse,
-  FaEye, // Ikon mata untuk detail
-  FaSearch, // Ikon pencarian
-} from "react-icons/fa";
+import { FaSearch, FaEye, FaEdit, FaTrash } from "react-icons/fa";
 import PageHeader from "../components/Page.Header";
-import { dataProducts } from "../data/product"; // Pastikan data furniture ada di sini
 import { Link } from "react-router-dom";
+import { supabase } from "../lib/supabaseClient";
 
 export default function Product() {
+  const [products, setProducts] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [isFormOpen, setIsFormOpen] = useState(false);
-  
-  // --- PENERAPAN useState ---
   const [searchKeyword, setSearchKeyword] = useState("");
-
-  // --- PENERAPAN useRef ---
+  
+  // Form State
+  const [formData, setFormData] = useState({
+    name: "",
+    code: "",
+    category: "",
+    price: "",
+    stock: "",
+    image: ""
+  });
+  const [editingId, setEditingId] = useState(null);
   const titleInputRef = useRef(null);
 
-  // Efek samping untuk otomatis fokus input menggunakan useRef
+  useEffect(() => {
+    fetchProducts();
+  }, []);
+
   useEffect(() => {
     if (isFormOpen) {
-      // Tunggu sebentar sampai modal benar-benar di-render, lalu fokuskan
       setTimeout(() => {
         titleInputRef.current?.focus();
       }, 100);
     }
   }, [isFormOpen]);
 
-  // Logika Filter Produk dengan state searchKeyword
-  const filteredProducts = dataProducts.filter((product) =>
-    product.title.toLowerCase().includes(searchKeyword.toLowerCase())
+  const fetchProducts = async () => {
+    try {
+      setLoading(true);
+      const { data, error } = await supabase.from('products').select('*').order('created_at', { ascending: false });
+      if (error) throw error;
+      setProducts(data || []);
+    } catch (err) {
+      console.error("Error fetching products:", err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleChange = (e) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
+
+  const handleOpenForm = (product = null) => {
+    if (product) {
+      setEditingId(product.id);
+      setFormData({
+        name: product.name || product.title || "",
+        code: product.code || "",
+        category: product.category || "",
+        price: product.price || "",
+        stock: product.stock || "",
+        image: product.image || ""
+      });
+    } else {
+      setEditingId(null);
+      setFormData({ name: "", code: "", category: "", price: "", stock: "", image: "" });
+    }
+    setIsFormOpen(true);
+  };
+
+  const handleSave = async (e) => {
+    e.preventDefault();
+    try {
+      const payload = {
+        name: formData.name,
+        code: formData.code,
+        category: formData.category,
+        price: Number(formData.price),
+        stock: Number(formData.stock),
+        image: formData.image
+      };
+
+      if (editingId) {
+        const { error } = await supabase.from('products').update(payload).eq('id', editingId);
+        if (error) throw error;
+        alert("Produk berhasil diperbarui!");
+      } else {
+        const { error } = await supabase.from('products').insert([payload]);
+        if (error) throw error;
+        alert("Produk berhasil ditambahkan!");
+      }
+      setIsFormOpen(false);
+      fetchProducts();
+    } catch (err) {
+      alert("Gagal menyimpan produk: " + err.message);
+    }
+  };
+
+  const handleDelete = async (id) => {
+    if (window.confirm("Apakah Anda yakin ingin menghapus produk ini?")) {
+      try {
+        const { error } = await supabase.from('products').delete().eq('id', id);
+        if (error) throw error;
+        fetchProducts();
+      } catch (err) {
+        alert("Gagal menghapus produk: " + err.message);
+      }
+    }
+  };
+
+  const filteredProducts = products.filter((product) =>
+    (product.name || product.title || "").toLowerCase().includes(searchKeyword.toLowerCase())
   );
 
   return (
@@ -46,121 +123,124 @@ export default function Product() {
               placeholder="Search product..." 
               value={searchKeyword}
               onChange={(e) => setSearchKeyword(e.target.value)}
-              className="pl-9 pr-4 py-2 border border-gray-200 rounded-lg text-sm outline-none focus:border-hijau shadow-sm w-64 transition-all"
+              className="pl-9 pr-4 py-2 border border-gray-200 rounded-lg text-sm outline-none focus:border-[#4F45B6] shadow-sm w-64 transition-all"
             />
             <FaSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 text-xs" />
           </div>
           <button
-            onClick={() => setIsFormOpen(true)}
-            className="bg-hijau text-white px-5 py-2 rounded-lg hover:bg-green-600 shadow-sm font-semibold transition-all"
+            onClick={() => handleOpenForm()}
+            className="bg-[#4F45B6] text-white px-5 py-2 rounded-lg hover:bg-[#3c348f] shadow-sm font-semibold transition-all"
           >
             + Add Product
           </button>
         </div>
       </PageHeader>
 
-      {/* TABEL DATA PRODUCTS */}
       <div className="mx-5 p-6 bg-white rounded-2xl shadow-sm mt-4">
-        <div className="overflow-x-auto">
-          <table className="w-full text-left">
-            <thead>
-              <tr className="text-gray-400 border-b border-gray-100 uppercase text-xs">
-                <th className="pb-4 font-medium">ID</th>
-                <th className="pb-4 font-medium">Image</th>
-                <th className="pb-4 font-medium">Furniture Name</th>
-                <th className="pb-4 font-medium">Code</th>
-                <th className="pb-4 font-medium">Category</th>
-                <th className="pb-4 font-medium">Price</th>
-                <th className="pb-4 font-medium">Stock</th>
-                <th className="pb-4 font-medium text-center">Action</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-gray-50">
-              {filteredProducts.length > 0 ? (
-                filteredProducts.map((product, index) => (
-                  <tr key={index} className="hover:bg-gray-50 transition-colors">
-                    <td className="py-4 font-bold text-gray-400">#{product.id}</td>
-                  <td className="py-4">
-                    <img 
-                      src={product.image} 
-                      alt={product.title}
-                      className="w-12 h-12 rounded-lg object-cover shadow-sm border border-gray-100"
-                    />
-                  </td>
-                  <td className="py-4 font-semibold text-gray-800">
-                    {product.title}
-                  </td>
-                  <td className="py-4">
-                    <code className="bg-gray-100 px-2 py-1 rounded text-[10px] text-gray-600">
-                      {product.code}
-                    </code>
-                  </td>
-                  <td className="py-4">
-                    <span className="px-2 py-1 bg-blue-50 text-blue-600 rounded text-[10px] font-bold uppercase">
-                      {product.category}
-                    </span>
-                  </td>
-                  <td className="py-4 font-bold text-hijau">
-                    Rp {product.price.toLocaleString("id-ID")}
-                  </td>
-                  <td className="py-4">
-                    <span
-                      className={`px-3 py-1 rounded-full text-[10px] font-extrabold uppercase ${
-                        product.stock > 20
-                          ? "bg-green-100 text-green-600"
-                          : "bg-red-100 text-red-600"
-                      }`}
-                    >
-                      {product.stock} units
-                    </span>
-                  </td>
-                  <td className="py-4 text-center">
-                    {/* TOMBOL MATA UNTUK DETAIL */}
-                    <Link
-                      to={`/product/${product.id}`}
-                      className="inline-flex items-center justify-center p-2 bg-gray-100 text-gray-500 hover:bg-hijau hover:text-white rounded-lg transition-all"
-                    >
-                      <FaEye size={16} />
-                    </Link>
-                  </td>
+        {loading ? (
+          <div className="py-8 text-center text-gray-500 font-bold">Memuat data produk...</div>
+        ) : (
+          <div className="overflow-x-auto">
+            <table className="w-full text-left">
+              <thead>
+                <tr className="text-gray-400 border-b border-gray-100 uppercase text-xs">
+                  <th className="pb-4 font-medium">Image</th>
+                  <th className="pb-4 font-medium">Name</th>
+                  <th className="pb-4 font-medium">Code</th>
+                  <th className="pb-4 font-medium">Category</th>
+                  <th className="pb-4 font-medium">Price</th>
+                  <th className="pb-4 font-medium">Stock</th>
+                  <th className="pb-4 font-medium text-center">Action</th>
                 </tr>
-              ))
-              ) : (
-                <tr>
-                  <td colSpan="8" className="py-8 text-center text-gray-400">
-                    Product not found.
-                  </td>
-                </tr>
-              )}
-            </tbody>
-          </table>
-        </div>
+              </thead>
+              <tbody className="divide-y divide-gray-50">
+                {filteredProducts.length > 0 ? (
+                  filteredProducts.map((product) => (
+                    <tr key={product.id} className="hover:bg-gray-50 transition-colors">
+                      <td className="py-4">
+                        {product.image ? (
+                          <img src={product.image} alt={product.name} className="w-12 h-12 rounded-lg object-cover shadow-sm border border-gray-100" />
+                        ) : (
+                          <div className="w-12 h-12 bg-gray-200 rounded-lg flex items-center justify-center text-xs text-gray-400">No Img</div>
+                        )}
+                      </td>
+                      <td className="py-4 font-semibold text-gray-800">{product.name || product.title}</td>
+                      <td className="py-4">
+                        <code className="bg-gray-100 px-2 py-1 rounded text-[10px] text-gray-600">{product.code || 'N/A'}</code>
+                      </td>
+                      <td className="py-4">
+                        <span className="px-2 py-1 bg-blue-50 text-blue-600 rounded text-[10px] font-bold uppercase">{product.category || 'General'}</span>
+                      </td>
+                      <td className="py-4 font-bold text-[#4F45B6]">Rp {(product.price || 0).toLocaleString("id-ID")}</td>
+                      <td className="py-4">
+                        <span className={`px-3 py-1 rounded-full text-[10px] font-extrabold uppercase ${(product.stock || 0) > 20 ? "bg-green-100 text-green-600" : "bg-red-100 text-red-600"}`}>
+                          {product.stock || 0} units
+                        </span>
+                      </td>
+                      <td className="py-4 text-center">
+                        <div className="flex items-center justify-center space-x-2">
+                          <button onClick={() => handleOpenForm(product)} className="p-2 bg-yellow-50 text-yellow-600 hover:bg-yellow-500 hover:text-white rounded-lg transition-all" title="Edit Product">
+                            <FaEdit size={14} />
+                          </button>
+                          <button onClick={() => handleDelete(product.id)} className="p-2 bg-red-50 text-red-600 hover:bg-red-500 hover:text-white rounded-lg transition-all" title="Delete Product">
+                            <FaTrash size={14} />
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))
+                ) : (
+                  <tr>
+                    <td colSpan="7" className="py-8 text-center text-gray-400">
+                      Tidak ada produk ditemukan.
+                    </td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
+          </div>
+        )}
       </div>
 
-      {/* MODAL FORM (Tetap Menggunakan UI Kamu) */}
       {isFormOpen && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white p-6 rounded-xl w-full max-w-md shadow-2xl">
-            <h2 className="text-xl font-bold mb-4">Add New Furniture</h2>
-            <form className="flex flex-col space-y-3">
-              {/* Tambahkan ref ke input pertama ini */}
-              <input 
-                ref={titleInputRef}
-                type="text" 
-                placeholder="Furniture Title" 
-                className="border p-2 rounded-md outline-none focus:border-hijau" 
-              />
-              <input type="text" placeholder="Code" className="border p-2 rounded-md outline-none focus:border-hijau" />
-              <input type="text" placeholder="Category" className="border p-2 rounded-md outline-none focus:border-hijau" />
-              <input type="number" placeholder="Price" className="border p-2 rounded-md outline-none focus:border-hijau" />
-              <input type="number" placeholder="Stock" className="border p-2 rounded-md outline-none focus:border-hijau" />
-
-              <div className="flex justify-end space-x-2 mt-4">
-                <button type="button" onClick={() => setIsFormOpen(false)} className="px-4 py-2 text-gray-500 hover:bg-gray-100 rounded-md">
+          <div className="bg-white p-6 rounded-2xl w-full max-w-md shadow-2xl">
+            <h2 className="text-2xl font-black mb-6 text-gray-900">{editingId ? "Edit Furniture" : "Add New Furniture"}</h2>
+            <form onSubmit={handleSave} className="flex flex-col space-y-4">
+              <div>
+                <label className="text-xs font-bold text-gray-500 uppercase">Product Name</label>
+                <input ref={titleInputRef} type="text" name="name" value={formData.name} onChange={handleChange} required placeholder="Contoh: Sofa Minimalis" className="w-full border border-gray-200 p-3 rounded-xl outline-none focus:border-[#4F45B6] transition-colors" />
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="text-xs font-bold text-gray-500 uppercase">Product Code</label>
+                  <input type="text" name="code" value={formData.code} onChange={handleChange} required placeholder="FRN-001" className="w-full border border-gray-200 p-3 rounded-xl outline-none focus:border-[#4F45B6] transition-colors" />
+                </div>
+                <div>
+                  <label className="text-xs font-bold text-gray-500 uppercase">Category</label>
+                  <input type="text" name="category" value={formData.category} onChange={handleChange} required placeholder="Living Room" className="w-full border border-gray-200 p-3 rounded-xl outline-none focus:border-[#4F45B6] transition-colors" />
+                </div>
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="text-xs font-bold text-gray-500 uppercase">Price (Rp)</label>
+                  <input type="number" name="price" value={formData.price} onChange={handleChange} required placeholder="5000000" className="w-full border border-gray-200 p-3 rounded-xl outline-none focus:border-[#4F45B6] transition-colors" />
+                </div>
+                <div>
+                  <label className="text-xs font-bold text-gray-500 uppercase">Stock</label>
+                  <input type="number" name="stock" value={formData.stock} onChange={handleChange} required placeholder="50" className="w-full border border-gray-200 p-3 rounded-xl outline-none focus:border-[#4F45B6] transition-colors" />
+                </div>
+              </div>
+              <div>
+                <label className="text-xs font-bold text-gray-500 uppercase">Image URL</label>
+                <input type="url" name="image" value={formData.image} onChange={handleChange} required placeholder="https://images.unsplash.com/..." className="w-full border border-gray-200 p-3 rounded-xl outline-none focus:border-[#4F45B6] transition-colors" />
+              </div>
+              <div className="flex justify-end space-x-3 mt-8 pt-4 border-t border-gray-100">
+                <button type="button" onClick={() => setIsFormOpen(false)} className="px-6 py-3 font-bold text-gray-500 hover:bg-gray-100 rounded-xl transition-colors">
                   Cancel
                 </button>
-                <button type="button" onClick={() => setIsFormOpen(false)} className="px-4 py-2 bg-hijau text-white rounded-md hover:bg-green-600">
-                  Save Data
+                <button type="submit" className="px-6 py-3 font-bold bg-[#4F45B6] text-white rounded-xl hover:bg-[#3c348f] transition-colors">
+                  {editingId ? "Update Product" : "Save Product"}
                 </button>
               </div>
             </form>

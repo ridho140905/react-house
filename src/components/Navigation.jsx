@@ -1,53 +1,39 @@
-import React, { useState, useEffect } from 'react';
-import { Search, ChevronDown, MessageSquareText, Bell, Settings, LogOut } from 'lucide-react';
+import React from 'react';
+import { Search, ChevronDown, MessageSquareText, Bell, Settings, LogOut, ShoppingCart } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../contexts/AuthContext';
+import { useCart } from '../contexts/CartContext';
 
 // Mengimpor foto profil dari folder assets
 import ProfilePhoto from '../assets/foto.jpeg';
 
 const Navigation = () => {
   const navigate = useNavigate();
+  const { session, profile, signOut } = useAuth();
+  const { cart } = useCart();
   const EXACT_THEME_COLOR = "#4F45B6";
 
-  // Inisialisasi awal di-set ke null agar tidak bocor data default
-  const [userData, setUserData] = useState(null);
-
-  // PROTEKSI ROUTE: Ambil data session saat komponen dimuat
-  useEffect(() => {
-    const session = localStorage.getItem("user");
-    if (!session) {
-      // JIKA SESSION KOSONG, TENDANG LANGSUNG KE LOGIN (Anti tembak URL)
-      navigate("/login");
-    } else {
-      try {
-        setUserData(JSON.parse(session));
-      } catch (e) {
-        console.error("Gagal membaca session data", e);
-        localStorage.removeItem("user");
-        navigate("/login");
-      }
-    }
-  }, [navigate]);
+  const totalCartItems = cart.reduce((acc, item) => acc + item.quantity, 0);
 
   // Fungsi untuk Logout (Dibersihkan total)
-  const handleLogout = () => {
+  const handleLogout = async () => {
     const konfirmasi = window.confirm("Apakah Anda yakin ingin logout?");
     if (konfirmasi) {
-      // 1. Hapus dari penyimpanan browser
-      localStorage.removeItem("user");
-      
-      // 2. Hapus dari state React (Biar hantu session-nya hilang)
-      setUserData(null);
-      
-      // 3. Pindah ke login
+      await signOut();
       navigate("/login");
     }
   };
 
-  // Jika userData belum siap/null, tampilkan loading kosong atau jangan render dulu demi keamanan
-  if (!userData) {
+  // Jika belum ada session, tampilkan loading kosong
+  if (!session) {
     return <div className="h-16 bg-white border-b border-gray-100 w-full animate-pulse"></div>;
   }
+
+  // Gunakan fallback jika profile null (karena delay sinkronisasi tabel)
+  const safeProfile = profile || {
+    full_name: session?.user?.user_metadata?.full_name || 'Member',
+    role: session?.user?.user_metadata?.role || 'member'
+  };
 
   return (
     <nav className="flex items-center justify-between w-full px-8 py-4 bg-white font-['Cairo'] border-b border-gray-100 shrink-0 relative z-50">
@@ -88,26 +74,30 @@ const Navigation = () => {
 
         {/* Notification Icons */}
         <div className="flex items-center gap-6">
+          {/* Cart Icon */}
+          <button 
+            onClick={() => navigate(safeProfile.role === 'admin' ? '/admin-dashboard' : '/member-dashboard')} 
+            className="relative text-gray-400 hover:text-gray-600 transition-colors"
+          >
+            <ShoppingCart className="w-6 h-6" strokeWidth={2} style={{ color: totalCartItems > 0 ? EXACT_THEME_COLOR : undefined }} />
+            {totalCartItems > 0 && (
+              <span 
+                className="absolute -top-1.5 -right-1.5 flex items-center justify-center w-4 h-4 text-white text-[10px] font-bold rounded-full border-2 border-white box-content"
+                style={{ backgroundColor: EXACT_THEME_COLOR }}
+              >
+                {totalCartItems}
+              </span>
+            )}
+          </button>
+
           {/* Messages */}
           <button className="relative text-gray-400 hover:text-gray-600 transition-colors">
             <MessageSquareText className="w-6 h-6" strokeWidth={2} />
-            <span 
-              className="absolute -top-1.5 -right-1.5 flex items-center justify-center w-4 h-4 text-white text-[10px] font-bold rounded-full border-2 border-white box-content"
-              style={{ backgroundColor: EXACT_THEME_COLOR }}
-            >
-              2
-            </span>
           </button>
           
           {/* Bell */}
           <button className="relative text-gray-400 hover:text-gray-600 transition-colors">
             <Bell className="w-6 h-6" strokeWidth={2} />
-            <span 
-              className="absolute -top-1.5 -right-1.5 flex items-center justify-center w-4 h-4 text-white text-[10px] font-bold rounded-full border-2 border-white box-content"
-              style={{ backgroundColor: EXACT_THEME_COLOR }}
-            >
-              2
-            </span>
           </button>
           
           {/* Settings */}
@@ -121,7 +111,7 @@ const Navigation = () => {
 
         {/* User Profile */}
         <div className="flex items-center gap-3 text-left">
-          <div className="w-10 h-10 rounded-xl overflow-hidden shadow-sm border border-gray-100">
+          <div className="w-10 h-10 rounded-xl overflow-hidden shadow-sm border border-gray-100 flex-shrink-0">
             <img 
               src={ProfilePhoto} 
               alt="Profile" 
@@ -129,8 +119,8 @@ const Navigation = () => {
             />
           </div>
           <div className="flex flex-col">
-            <span className="text-sm font-bold text-gray-900 leading-tight">{userData.name}</span>
-            <span className="text-xs text-gray-400 font-semibold leading-tight mt-0.5">{userData.role}</span>
+            <span className="text-sm font-bold text-gray-900 leading-tight">{safeProfile.full_name}</span>
+            <span className="text-xs text-gray-400 font-semibold leading-tight mt-0.5 capitalize">{safeProfile.role}</span>
           </div>
         </div>
 

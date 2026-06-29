@@ -1,6 +1,4 @@
 import { useState } from "react";
-import bcrypt from "bcryptjs";
-import axios from "axios";
 import { Link, useNavigate } from "react-router-dom";
 import { BsFillExclamationDiamondFill } from "react-icons/bs";
 import { ImSpinner2 } from "react-icons/im";
@@ -8,12 +6,12 @@ import LoginInput from "../../components/login/Logininput";
 import LoginButton from "../../components/login/Loginbutton";
 import LoginDivider from "../../components/login/Logindivider";
 import SocialLoginButton from "../../components/login/Socialloginbutton";
-
-const API_URL = "https://ldjlujubthlehyhruqfp.supabase.co/rest/v1/users";
-const API_KEY = "sb_publishable_Ax35tbMkLxWTxZF1H0jddA_kwjDao2g";
+import { useAuth } from "../../contexts/AuthContext";
+import { supabase } from "../../lib/supabaseClient";
 
 export default function Login() {
   const navigate = useNavigate();
+  const { signIn } = useAuth();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [dataForm, setDataForm] = useState({ email: "", password: "" });
@@ -29,61 +27,34 @@ export default function Login() {
     setError("");
 
     try {
-      // Membersihkan sisa session lama sebelum membuat yang baru
-      localStorage.removeItem("user");
+      const { data, error } = await signIn(dataForm.email, dataForm.password);
 
-      // Ambil user berdasarkan email dari Supabase
-      const response = await axios.get(
-        `${API_URL}?email=eq.${encodeURIComponent(dataForm.email)}&select=*`,
-        {
-          headers: {
-            apikey: API_KEY,
-            Authorization: `Bearer ${API_KEY}`,
-            "Content-Type": "application/json",
-          },
+      if (error) {
+        setError(error.message);
+        return;
+      }
+
+      // Ambil role dari tabel profiles untuk menentukan arah redirect
+      if (data?.user) {
+        const { data: profileData } = await supabase
+          .from('profiles')
+          .select('role')
+          .eq('id', data.user.id)
+          .single();
+
+        const userRole = profileData?.role?.toLowerCase() || 'member';
+
+        if (userRole === 'admin') {
+          navigate("/dashboard");
+        } else {
+          navigate("/member-dashboard");
         }
-      );
-
-      const users = response.data;
-
-      if (!users || users.length === 0) {
-        setError("Email tidak ditemukan. Silakan periksa kembali.");
-        return;
-      }
-
-      const user = users[0];
-      const storedPassword = user?.password;
-
-      if (storedPassword == null) {
-        setError("Password pengguna tidak tersedia. Hubungi admin atau periksa data Supabase.");
-        return;
-      }
-
-      const normalizedPassword = typeof storedPassword === "number" ? String(storedPassword) : storedPassword;
-      const usesBcryptHash = typeof normalizedPassword === "string" && /^\$2[aby]\$/.test(normalizedPassword);
-      const isPasswordMatch = usesBcryptHash
-        ? await bcrypt.compare(dataForm.password, normalizedPassword)
-        : dataForm.password === normalizedPassword;
-
-      if (!isPasswordMatch) {
-        setError("Password salah. Silakan coba lagi.");
-        return;
-      }
-
-      // Login berhasil — simpan info user ke localStorage
-      localStorage.setItem("user", JSON.stringify({ id: user.id, name: user.name, email: user.email, role: user.role }));
-      
-      // Mengarahkan ke halaman yang sesuai berdasarkan role
-      const userRole = user.role ? user.role.toLowerCase() : "";
-      if (userRole === "guest") {
-        navigate("/guest-dashboard");
       } else {
-        // Default ke dashboard (termasuk role admin)
         navigate("/dashboard");
       }
 
     } catch (err) {
-      setError(err.response?.data?.message || err.message || "Terjadi kesalahan. Silakan coba lagi.");
+      setError(err.message || "Terjadi kesalahan. Silakan coba lagi.");
     } finally {
       setLoading(false);
     }
