@@ -10,19 +10,19 @@ import CompanyProfile from '../components/Guest/CompanyProfile';
 import MembershipTiers from '../components/Guest/MembershipTiers';
 import ContactUs from '../components/Guest/ContactUs';
 import GuestFooter from '../components/Guest/GuestFooter';
+import HeroCarousel from '../components/Guest/HeroCarousel';
 
 const GuestDashboard = () => {
   return (
     <div className="w-full">
+      <HeroCarousel />
+      
       {/* HERO SECTION */}
       <section id="hero" className="bg-white py-16 md:py-24 border-b border-gray-100 overflow-hidden">
         <div className="max-w-7xl mx-auto px-6 md:px-8 grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
           
           {/* Hero Text */}
           <div className="space-y-6">
-            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[#F4F2FF] text-[#4F45B6] text-xs font-bold uppercase tracking-wider">
-              <FiAward className="w-4 h-4" /> Program Loyalitas Antigravity
-            </div>
             <h1 className="text-4xl md:text-5xl lg:text-6xl font-black text-gray-900 leading-tight">
               Kenyamanan Ekstra <br />
               <span className="text-[#4F45B6]">Di Setiap Sudut Rumah</span>

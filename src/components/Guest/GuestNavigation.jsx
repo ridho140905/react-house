@@ -34,7 +34,7 @@ const GuestNavigation = () => {
       {/* Logo & Brand */}
       <Link to="/guest-dashboard" className="flex items-center gap-3 cursor-pointer">
         <img src={LogoImage} alt="Logo" className="w-10 h-10 rounded-lg object-cover" />
-        <span className="text-xl font-black tracking-tight text-gray-800">FurnitureKu</span>
+        <span className="text-xl font-black tracking-tight text-gray-800">FurnitureQ</span>
       </Link>
 
       {/* Center Links */}

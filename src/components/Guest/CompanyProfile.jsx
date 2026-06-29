@@ -8,7 +8,7 @@ const CompanyProfile = () => {
         <div className="inline-block px-4 py-1.5 rounded-full bg-[#F4F2FF] text-[#4F45B6] text-xs font-bold uppercase tracking-wider mb-2">
           Profil Perusahaan
         </div>
-        <h2 className="text-3xl md:text-4xl font-black text-gray-900">Tentang Furnitureku</h2>
+        <h2 className="text-3xl md:text-4xl font-black text-gray-900">Tentang FurnitureQ</h2>
         <p className="text-gray-500 text-lg">
           Kami berdedikasi untuk menghadirkan furniture modern berkualitas tinggi, estetik, dan fungsional untuk memperindah setiap sudut rumah Anda.
         </p>

@@ -23,7 +23,7 @@ const CRMChatWidget = () => {
           {/* Messages Area */}
           <div className="flex-1 p-4 bg-gray-50 overflow-y-auto flex flex-col space-y-3">
             <div className="bg-[#F4F2FF] text-[#3c348f] p-3 rounded-xl rounded-tl-none self-start max-w-[85%] text-sm">
-              Halo! Ada yang bisa kami bantu terkait pesanan atau produk FurnitureKu? 😊
+              Halo! Ada yang bisa kami bantu terkait pesanan atau produk FurnitureQ? 😊
             </div>
             <div className="bg-white border border-gray-200 text-gray-800 p-3 rounded-xl rounded-tr-none self-end max-w-[85%] text-sm shadow-sm">
               Saya ingin bertanya tentang garansi sofa Nordic.

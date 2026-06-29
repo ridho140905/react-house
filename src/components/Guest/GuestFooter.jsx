@@ -12,7 +12,7 @@ const GuestFooter = () => {
           <div className="space-y-6">
             <div className="flex items-center gap-3">
               <img src={LogoImage} alt="Logo" className="w-10 h-10 rounded-lg object-cover bg-white" />
-              <span className="text-2xl font-black tracking-tight">FurnitureKu</span>
+              <span className="text-2xl font-black tracking-tight">FurnitureQ</span>
             </div>
             <p className="text-gray-400 text-sm leading-relaxed">
               Solusi interior modern untuk rumah impian Anda. Kami menyediakan berbagai pilihan furniture berkualitas tinggi dengan layanan Membership eksklusif.
@@ -75,7 +75,7 @@ const GuestFooter = () => {
               </li>
               <li className="flex items-center gap-3">
                 <FiMail className="w-5 h-5 text-[#4F45B6] shrink-0" />
-                <span>cs@furnitureku.com</span>
+                <span>cs@furnitureq.com</span>
               </li>
             </ul>
           </div>
@@ -85,7 +85,7 @@ const GuestFooter = () => {
         {/* Footer Bottom */}
         <div className="pt-8 border-t border-white/10 flex flex-col md:flex-row justify-between items-center gap-4">
           <p className="text-sm text-gray-500 text-center md:text-left">
-            &copy; {new Date().getFullYear()} FurnitureKu - Antigravity. All rights reserved.
+            &copy; {new Date().getFullYear()} FurnitureQ. All rights reserved.
           </p>
           <div className="flex gap-4 text-sm text-gray-500">
             <span className="hover:text-white cursor-pointer transition-colors">Dibuat oleh Ridho Prasetyo</span>

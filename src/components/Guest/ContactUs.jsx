@@ -30,7 +30,7 @@ const ContactUs = () => {
               </div>
               <div className="flex items-center gap-4 text-gray-600">
                 <FiMail className="w-5 h-5 text-[#4F45B6] shrink-0" />
-                <span>support@furnitureku.com</span>
+                <span>support@furnitureq.com</span>
               </div>
               <div className="flex items-center gap-4 text-gray-600">
                 <FiClock className="w-5 h-5 text-[#4F45B6] shrink-0" />
