@@ -9,31 +9,33 @@ const UserReviews = () => {
     <section className="mt-8">
       <h3 className="text-lg font-bold text-gray-800 mb-4">User Reviews</h3>
       <div className="flex items-center gap-4">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 flex-1">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 flex-1 items-stretch">
           {reviews.map((rev, idx) => (
             <div
               key={idx}
-              className="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm"
+              className="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm flex flex-col h-full justify-between"
             >
-              <div className="flex gap-1 mb-2">
-                {[...Array(5)].map((_, i) => (
-                  <FiStar
-                    key={i}
-                    size={14}
-                    className={
-                      i < rev.rating
-                        ? "text-yellow-400 fill-current"
-                        : "text-gray-300"
-                    }
-                  />
-                ))}
-                <span className="ml-2 text-sm font-bold text-gray-800">
+              <p className="text-sm text-gray-600 leading-relaxed italic mb-4">
+                "{rev.comment}"
+              </p>
+              <div className="flex items-center justify-between mt-auto pt-4 border-t border-gray-50">
+                <span className="text-sm font-bold text-gray-900">
                   {rev.name}
                 </span>
+                <div className="flex gap-1">
+                  {[...Array(5)].map((_, i) => (
+                    <FiStar
+                      key={i}
+                      size={14}
+                      className={
+                        i < rev.rating
+                          ? "text-yellow-400 fill-current"
+                          : "text-gray-200"
+                      }
+                    />
+                  ))}
+                </div>
               </div>
-              <p className="text-xs text-gray-400 leading-relaxed line-clamp-2">
-                {rev.comment}
-              </p>
             </div>
           ))}
         </div>

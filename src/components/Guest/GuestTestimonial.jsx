@@ -13,15 +13,17 @@ const GuestTestimonial = () => {
         <p className="text-gray-500 text-lg">Ribuan pelanggan telah mempercayakan kenyamanan rumahnya kepada kami.</p>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-8 items-stretch">
         {testimonials.map((testi, idx) => (
-          <div key={idx} className="bg-white p-8 rounded-3xl border border-gray-100 shadow-sm hover:shadow-lg transition-shadow">
-            <div className="flex items-center gap-2 mb-6 text-yellow-400">
-              {[...Array(5)].map((_, i) => (
-                <FiStar key={i} className={i < testi.rating ? "fill-current" : "text-gray-200"} />
-              ))}
+          <div key={idx} className="flex flex-col justify-between h-full bg-white p-8 rounded-3xl border border-gray-100 shadow-sm hover:shadow-lg transition-shadow">
+            <div>
+              <div className="flex items-center gap-2 mb-6 text-yellow-400">
+                {[...Array(5)].map((_, i) => (
+                  <FiStar key={i} className={i < testi.rating ? "fill-current" : "text-gray-200"} />
+                ))}
+              </div>
+              <p className="text-gray-600 mb-8 italic">"{testi.comment}"</p>
             </div>
-            <p className="text-gray-600 mb-8 italic">"{testi.comment}"</p>
             <div className="flex items-center gap-4 mt-auto">
               <img src={testi.avatar} alt={testi.name} className="w-12 h-12 rounded-full object-cover" />
               <div>

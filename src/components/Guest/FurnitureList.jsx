@@ -1,42 +1,33 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
+import { supabase } from '../../lib/supabaseClient';
 import FurnitureCard from './FurnitureCard';
-
-const dummyData = [
-  {
-    id: 'nordic-sofa',
-    name: "Nordic Minimalist Sofa",
-    description: "Sofa 3 dudukan dengan kain linen premium dan kaki kayu solid oak.",
-    price: 4500000,
-    rating: 4.8,
-    image: "https://images.unsplash.com/photo-1555041469-a586c61ea9bc?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80"
-  },
-  {
-    id: 'ergo-chair',
-    name: "Ergo Lounge Chair",
-    description: "Kursi santai ergonomis dengan bantalan busa memori tebal.",
-    price: 2100000,
-    rating: 4.9,
-    image: "https://images.unsplash.com/photo-1598300042247-d088f8ab3a91?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80"
-  },
-  {
-    id: 'oak-table',
-    name: "Modern Oak Dining Table",
-    description: "Meja makan kayu ek solid untuk 6 orang, desain elegan dan kokoh.",
-    price: 5200000,
-    rating: 4.7,
-    image: "https://images.unsplash.com/photo-1577140917170-285929fb55b7?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80"
-  },
-  {
-    id: 'tv-cabinet',
-    name: "Aesthetic TV Cabinet",
-    description: "Rak TV minimalis dengan kompartemen penyimpanan luas.",
-    price: 1850000,
-    rating: 4.6,
-    image: "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80"
-  }
-];
+import {
+  Carousel,
+  CarouselContent,
+  CarouselItem,
+  CarouselNext,
+  CarouselPrevious,
+} from '../ui/carousel';
 
 const FurnitureList = () => {
+  const [products, setProducts] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchProducts = async () => {
+      try {
+        const { data, error } = await supabase.from('products').select('*');
+        if (error) throw error;
+        if (data) setProducts(data);
+      } catch (err) {
+        console.error("Error fetching products:", err.message);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchProducts();
+  }, []);
+
   return (
     <div>
       <div className="flex justify-between items-end mb-6">
@@ -47,11 +38,34 @@ const FurnitureList = () => {
         <button className="text-[#4F45B6] font-semibold hover:text-[#3c348f] text-sm">Lihat Semua</button>
       </div>
       
-      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6">
-        {dummyData.map((item) => (
-          <FurnitureCard key={item.id} item={item} />
-        ))}
-      </div>
+      {loading ? (
+        <div className="text-center py-10 text-gray-500">Memuat katalog...</div>
+      ) : products.length === 0 ? (
+        <div className="text-center py-10 text-gray-500">Belum ada produk.</div>
+      ) : (
+        <Carousel
+          opts={{
+            align: "start",
+            loop: true,
+          }}
+          className="w-full relative"
+        >
+          <CarouselContent className="-ml-2 md:-ml-4">
+            {products.map((item) => (
+              <CarouselItem key={item.id} className="pl-2 md:pl-4 md:basis-1/2 xl:basis-1/4">
+                <div className="p-1">
+                  <FurnitureCard item={item} />
+                </div>
+              </CarouselItem>
+            ))}
+          </CarouselContent>
+          {/* Arrow navigation buttons that don't cover the cards but sit outside or float */}
+          <div className="hidden md:block">
+            <CarouselPrevious className="-left-12" />
+            <CarouselNext className="-right-12" />
+          </div>
+        </Carousel>
+      )}
     </div>
   );
 };
