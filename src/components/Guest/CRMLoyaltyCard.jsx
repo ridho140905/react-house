@@ -2,24 +2,17 @@ import React, { useState, useEffect } from 'react';
 import { FiAward, FiGift, FiStar, FiShield } from 'react-icons/fi';
 import { useNavigate } from 'react-router-dom';
 import { membershipTiers } from '../../data/membershipData';
+import { useAuth } from '../../contexts/AuthContext';
 
 const CRMLoyaltyCard = () => {
   const navigate = useNavigate();
-  const [activeTierId, setActiveTierId] = useState('tier-1');
-  const [points, setPoints] = useState(0);
+  const { profile } = useAuth();
+  
+  // Use profile's tier if available, otherwise default to Silver (tier-1)
+  const activeTier = membershipTiers.find(t => t.name.toLowerCase() === profile?.tier?.toLowerCase()) || membershipTiers[0];
+  const activeTierId = activeTier.id;
 
-  useEffect(() => {
-    const savedTier = localStorage.getItem("selectedTier");
-    if (savedTier) {
-      setActiveTierId(savedTier);
-    }
-    const savedPoints = localStorage.getItem("membershipPoints");
-    if (savedPoints) {
-      setPoints(parseInt(savedPoints));
-    }
-  }, []);
-
-  const activeTier = membershipTiers.find(t => t.id === activeTierId) || membershipTiers[0];
+  const points = profile?.total_points || 0;
 
   // Logic simpel untuk target poin
   let nextTier = 'Gold';
@@ -92,7 +85,7 @@ const CRMLoyaltyCard = () => {
         </div>
 
         <button 
-          onClick={() => navigate('/my-membership')}
+          onClick={() => navigate('/member-dashboard')}
           className="w-full bg-white text-gray-900 hover:bg-gray-50 py-3 rounded-xl font-bold text-sm transition-colors flex items-center justify-center space-x-2 shadow-lg mt-auto"
         >
           <FiGift className="w-4 h-4 text-[#4F45B6]" />

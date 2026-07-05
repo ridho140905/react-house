@@ -1,9 +1,11 @@
 import React from 'react';
-import { FiStar, FiShoppingCart } from 'react-icons/fi';
+import { FiStar, FiShoppingCart, FiEye } from 'react-icons/fi';
 import { useCart } from '../../contexts/CartContext';
+import { useNavigate } from 'react-router-dom';
 
 const FurnitureCard = ({ item }) => {
   const { addToCart } = useCart();
+  const navigate = useNavigate();
 
   const handleAddToCart = () => {
     addToCart(item);
@@ -35,12 +37,22 @@ const FurnitureCard = ({ item }) => {
             <span className="text-xs text-gray-400 uppercase tracking-wider">Harga</span>
             <span className="text-xl font-extrabold text-[#4F45B6]">Rp {item.price.toLocaleString()}</span>
           </div>
-          <button 
-            onClick={handleAddToCart}
-            className="bg-[#4F45B6] hover:bg-[#3c348f] text-white p-3 rounded-xl transition-colors shadow-sm hover:shadow-indigo-200"
-          >
-            <FiShoppingCart className="w-5 h-5" />
-          </button>
+          <div className="flex items-center gap-2">
+            <button 
+              onClick={() => navigate(`/product/${item.id}`)}
+              title="Lihat Detail Produk"
+              className="bg-gray-100 hover:bg-gray-200 text-gray-700 p-3 rounded-xl transition-colors shadow-sm"
+            >
+              <FiEye className="w-5 h-5" />
+            </button>
+            <button 
+              onClick={handleAddToCart}
+              title="Tambah ke Keranjang"
+              className="bg-[#4F45B6] hover:bg-[#3c348f] text-white p-3 rounded-xl transition-colors shadow-sm hover:shadow-indigo-200"
+            >
+              <FiShoppingCart className="w-5 h-5" />
+            </button>
+          </div>
         </div>
       </div>
     </div>

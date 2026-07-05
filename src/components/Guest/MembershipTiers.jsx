@@ -2,17 +2,15 @@ import React, { useState, useEffect } from 'react';
 import { FiCheckCircle, FiStar, FiAward, FiShield } from 'react-icons/fi';
 import { useNavigate } from 'react-router-dom';
 import { membershipTiers } from '../../data/membershipData';
+import { useAuth } from '../../contexts/AuthContext';
 
 const MembershipTiers = () => {
   const navigate = useNavigate();
-  const [selectedTierId, setSelectedTierId] = useState(null);
-
-  useEffect(() => {
-    const savedTier = localStorage.getItem("selectedTier");
-    if (savedTier) {
-      setSelectedTierId(savedTier);
-    }
-  }, []);
+  const { profile } = useAuth();
+  
+  // Use profile's tier to determine which is selected
+  const activeTier = membershipTiers.find(t => t.name.toLowerCase() === profile?.tier?.toLowerCase());
+  const selectedTierId = activeTier?.id || null;
 
   const getTierIcon = (id) => {
     switch(id) {
@@ -80,11 +78,10 @@ const MembershipTiers = () => {
                   </li>
                 ))}
               </ul>
-              
               <button 
                 onClick={() => {
                   if (isMyTier) {
-                    navigate('/my-membership');
+                    navigate('/member-dashboard');
                   } else {
                     navigate('/membership');
                   }

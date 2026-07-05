@@ -83,7 +83,7 @@ const GuestNavigation = () => {
         ) : (
           <>
             <Link 
-              to="/my-membership"
+              to="/member-dashboard"
               className="flex items-center gap-2 px-4 py-2 bg-[#F4F2FF] text-[#4F45B6] rounded-xl hover:bg-[#EBE9FE] transition-colors font-bold text-sm mr-2"
             >
               <Gift className="w-4 h-4" strokeWidth={2.5} />

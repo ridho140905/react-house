@@ -36,7 +36,7 @@ export default function Orders() {
 
   const handleUpdateStatus = async (id, newStatus) => {
     try {
-      const { error } = await supabase.from('orders').update({ status: newStatus }).eq('id', id);
+      const { error } = await supabase.rpc('update_order_status', { p_id: id, p_status: newStatus });
       if (error) throw error;
       fetchOrders();
     } catch (err) {
