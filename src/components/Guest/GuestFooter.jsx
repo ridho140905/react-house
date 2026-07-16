@@ -41,6 +41,8 @@ const GuestFooter = () => {
               <li><button onClick={() => document.getElementById('profil')?.scrollIntoView({ behavior: 'smooth' })} className="hover:text-white hover:translate-x-2 transition-all">Profil Perusahaan</button></li>
               <li><button onClick={() => document.getElementById('membership')?.scrollIntoView({ behavior: 'smooth' })} className="hover:text-white hover:translate-x-2 transition-all">Program Membership</button></li>
               <li><button onClick={() => document.getElementById('katalog')?.scrollIntoView({ behavior: 'smooth' })} className="hover:text-white hover:translate-x-2 transition-all">Katalog Produk</button></li>
+              <li><button onClick={() => document.getElementById('testimoni')?.scrollIntoView({ behavior: 'smooth' })} className="hover:text-white hover:translate-x-2 transition-all">Review Pelanggan</button></li>
+              <li><button onClick={() => document.getElementById('custom-furniture')?.scrollIntoView({ behavior: 'smooth' })} className="hover:text-white hover:translate-x-2 transition-all">Custom Furniture</button></li>
             </ul>
           </div>
 

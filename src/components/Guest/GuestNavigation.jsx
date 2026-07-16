@@ -38,11 +38,13 @@ const GuestNavigation = () => {
       </Link>
 
       {/* Center Links */}
-      <div className="hidden lg:flex items-center gap-8 font-bold text-gray-500 text-sm">
+      <div className="hidden lg:flex items-center gap-6 font-bold text-gray-500 text-sm">
         <button onClick={() => scrollToSection('hero')} className="hover:text-[#4F45B6] transition-colors">Home</button>
         <button onClick={() => scrollToSection('profil')} className="hover:text-[#4F45B6] transition-colors">Profil</button>
         <Link to="/membership" className="hover:text-[#4F45B6] transition-colors">Membership</Link>
-        <button onClick={() => scrollToSection('katalog')} className="hover:text-[#4F45B6] transition-colors">Katalog & Testimoni</button>
+        <button onClick={() => scrollToSection('katalog')} className="hover:text-[#4F45B6] transition-colors">Katalog</button>
+        <button onClick={() => scrollToSection('testimoni')} className="hover:text-[#4F45B6] transition-colors">Review</button>
+        <button onClick={() => scrollToSection('custom-furniture')} className="hover:text-[#4F45B6] transition-colors">Custom</button>
         <button onClick={() => scrollToSection('garansi')} className="hover:text-[#4F45B6] transition-colors">Layanan</button>
         <button onClick={() => scrollToSection('kontak')} className="hover:text-[#4F45B6] transition-colors">Hubungi</button>
       </div>
