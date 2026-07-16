@@ -1,5 +1,5 @@
 import React from 'react';
-import LogoImage from '../../assets/logoproject.png';
+import LogoImage from '../../assets/logo FurnitureQ.png';
 import { FiMapPin, FiPhone, FiMail, FiInstagram, FiFacebook, FiTwitter } from 'react-icons/fi';
 
 const GuestFooter = () => {

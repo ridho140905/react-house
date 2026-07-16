@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { Link } from 'react-router-dom';
 import { supabase } from '../lib/supabaseClient';
 import { useAuth } from '../contexts/AuthContext';
 import { useCart } from '../contexts/CartContext';
@@ -159,6 +160,24 @@ const MemberDashboard = () => {
             handleClaim={handleClaim} 
           />
           <EarnPointsList />
+        </div>
+
+        {/* Panduan Belanja & Link ke Guest Dashboard */}
+        <div className="bg-gradient-to-r from-[#4F45B6] to-[#6b62d9] rounded-3xl p-8 text-white shadow-lg flex flex-col md:flex-row items-center justify-between gap-6">
+          <div className="space-y-3 flex-1">
+            <h3 className="text-2xl font-bold flex items-center gap-2">
+              <span className="text-3xl">💡</span> Panduan Belanja
+            </h3>
+            <p className="text-purple-100 text-sm md:text-base leading-relaxed">
+              Untuk melakukan pembelanjaan, silakan menuju halaman <strong>Guest Dashboard</strong> terlebih dahulu. Temukan produk impian Anda pada <strong>Katalog Produk</strong>, masukkan ke keranjang, lalu klik tombol <strong>Kembali ke Dashboard</strong> di kanan atas untuk menyelesaikan proses <em>Checkout</em> di halaman ini.
+            </p>
+          </div>
+          <Link 
+            to="/guest-dashboard"
+            className="px-8 py-4 bg-white text-[#4F45B6] font-bold rounded-xl shadow hover:bg-gray-50 transition-colors whitespace-nowrap"
+          >
+            Ke Tampilan Guest
+          </Link>
         </div>
 
         {/* Konten Utama: Keranjang & Checkout */}

@@ -1,54 +1,75 @@
-import React from "react";
-import { MoreVertical, Mail, Bell, ThumbsUp, Layers3 } from "lucide-react";
+import React, { useState, useEffect } from "react";
+import { MoreVertical, Mail, Bell, ThumbsUp, Layers3, ShoppingBag } from "lucide-react";
+import { supabase } from "../lib/supabaseClient";
 
 const RightSidebar = () => {
-  // Data dummy untuk Contacts
-  const contacts = [
-    { name: "Tomy", img: "https://randomuser.me/api/portraits/men/1.jpg" },
-    { name: "Karen", img: "https://randomuser.me/api/portraits/women/2.jpg" },
-    { name: "Jordan", img: "https://randomuser.me/api/portraits/men/3.jpg" },
-    { name: "Jack", img: "https://randomuser.me/api/portraits/men/4.jpg" },
-    { name: "Nadia", img: "https://randomuser.me/api/portraits/women/5.jpg" },
-    { name: "Johnny", img: "https://randomuser.me/api/portraits/men/6.jpg" },
-    { name: "Martha", img: "https://randomuser.me/api/portraits/women/7.jpg" },
-    { name: "John", img: "https://randomuser.me/api/portraits/men/8.jpg" },
-  ];
+  const [contacts, setContacts] = useState([]);
+  const [messages, setMessages] = useState([]);
+  const [activities, setActivities] = useState([]);
 
-  // Data dummy untuk Recent Activity
-  const activities = [
-    {
-      type: "Assets",
-      title: "Transaction Assets",
-      desc: "Ab architecto provident ea accusamus.",
-      time: "2 Hour Ago",
-      icon: Layers3,
-      color: "bg-[#5D5FEF]",
-    },
-    {
-      type: "Mail",
-      title: "New Email Register",
-      desc: "Reiciendis aut aspernatur ea.",
-      time: "2 Hour Ago",
-      icon: Mail,
-      color: "bg-black",
-    },
-    {
-      type: "Assets",
-      title: "Transaction Assets",
-      desc: "Id architecto provident ea accusamus provident ea ea.",
-      time: "2 Hour Ago",
-      icon: Layers3,
-      color: "bg-[#FFB800]",
-    },
-    {
-      type: "Register",
-      title: "New Email Register",
-      desc: "Ab reiciendis aut provident ea accusamus.",
-      time: "4 Hour Ago",
-      icon: ThumbsUp,
-      color: "bg-[#FF7A00]",
-    },
-  ];
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        // Fetch Contacts (profiles)
+        const { data: profilesData } = await supabase
+          .from('profiles')
+          .select('*')
+          .order('created_at', { ascending: false })
+          .limit(8);
+
+        if (profilesData) {
+          setContacts(profilesData.map(p => ({
+            name: p.full_name || 'User',
+            img: `https://ui-avatars.com/api/?name=${encodeURIComponent(p.full_name || 'U')}&background=random`
+          })));
+        }
+
+        // Fetch Messages (menggunakan warranty_claims)
+        const { data: warrantyData } = await supabase
+          .from('warranty_claims')
+          .select('*')
+          .order('created_at', { ascending: false })
+          .limit(4);
+
+        if (warrantyData) {
+          setMessages(warrantyData.map(w => ({
+            name: w.customer_name || 'Customer',
+            desc: w.issue || 'Meminta klaim garansi...',
+            char: (w.customer_name || 'C').charAt(0).toUpperCase()
+          })));
+        }
+
+        // Fetch Activities (menggunakan orders)
+        const { data: ordersData } = await supabase
+          .from('orders')
+          .select('*, profiles:user_id ( full_name )')
+          .order('created_at', { ascending: false })
+          .limit(4);
+
+        if (ordersData) {
+          setActivities(ordersData.map(o => {
+            const timeDiffMs = new Date() - new Date(o.created_at);
+            const hours = Math.floor(timeDiffMs / (1000 * 60 * 60));
+            const timeStr = hours > 0 ? `${hours} Hour Ago` : 'Just Now';
+            
+            return {
+              type: "Order",
+              title: "Pesanan Baru",
+              desc: `${o.profiles?.full_name || 'Seseorang'} memesan senilai Rp ${(o.total_price || 0).toLocaleString('id-ID')}`,
+              time: timeStr,
+              icon: ShoppingBag,
+              color: "bg-[#FFB800]",
+            };
+          }));
+        }
+
+      } catch (error) {
+        console.error("Error fetching RightSidebar data:", error);
+      }
+    };
+
+    fetchData();
+  }, []);
 
   return (
     <aside className="w-[340px] border-l border-gray-100 bg-[#F5EFFC] p-6 space-y-8 font-['Cairo']">
@@ -149,24 +170,22 @@ const RightSidebar = () => {
           </button>
         </div>
         <div className="space-y-4">
-          {["Samantha William", "Tony Soap", "Jordan Nico", "Nadia Adja"].map(
-            (name, index) => (
+          {messages.map((msg, index) => (
               <div
                 key={index}
                 className="flex items-start gap-3 p-3 bg-white rounded-xl shadow-sm border border-gray-50 hover:bg-gray-50 cursor-pointer transition-colors"
               >
                 <div className="w-10 h-10 bg-[#A69FB5] rounded-xl flex items-center justify-center text-white font-bold text-lg">
-                  {name.charAt(0)}
+                  {msg.char}
                 </div>
                 <div className="flex-1">
-                  <p className="text-sm font-bold text-gray-900">{name}</p>
+                  <p className="text-sm font-bold text-gray-900">{msg.name}</p>
                   <p className="text-xs text-gray-400 line-clamp-1">
-                    Lorem ipsum dolor sit amet...
+                    {msg.desc}
                   </p>
                 </div>
               </div>
-            ),
-          )}
+            ))}
         </div>
       </section>
 

@@ -2,12 +2,11 @@ import React from 'react';
 import { NavLink } from 'react-router-dom';
 import { 
   Home, 
-  Mail, 
-  Smartphone,
-  Coins,
+  MessageCircle, 
+  Package,
+  Star,
   LayoutGrid,
   BookMarked,
-  BadgeDollarSign,
   CreditCard,
   Sparkles,
   Users,
@@ -16,7 +15,7 @@ import {
   Wrench
 } from 'lucide-react';
 
-import LogoImage from '../assets/logoproject.png'; 
+import LogoImage from '../assets/logo FurnitureQ.png'; 
 
 const EXACT_THEME_COLOR = "#4F45B6";
 const ACTIVE_BG_COLOR = "#F4F2FF";
@@ -29,10 +28,10 @@ const menuItems = [
   { icon: Users,           path: '/user' },
   { icon: Award,           path: '/membership-admin' },
   { icon: Wrench,          path: '/warranty-admin' },
-  { icon: Smartphone,      path: '/product' }, 
-  { icon: Mail,            path: '/chat' },      
-  { icon: BadgeDollarSign, path: '/review' },    
-  { icon: Sparkles,        path: '/fitur-baru' },
+  { icon: Package,         path: '/product' }, 
+  { icon: MessageCircle,   path: '/chat' },      
+  { icon: Star,            path: '/review' },    
+  { icon: Sparkles,        path: '/custom-furniture' },
 ];
 
 const Sidebar = () => {

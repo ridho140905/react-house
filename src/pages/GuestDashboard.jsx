@@ -9,6 +9,7 @@ import CRMChatWidget from '../components/Guest/CRMChatWidget';
 import CompanyProfile from '../components/Guest/CompanyProfile';
 import MembershipTiers from '../components/Guest/MembershipTiers';
 import ContactUs from '../components/Guest/ContactUs';
+import CustomFurnitureForm from '../components/Guest/CustomFurnitureForm';
 import GuestFooter from '../components/Guest/GuestFooter';
 import HeroCarousel from '../components/Guest/HeroCarousel';
 
@@ -100,6 +101,11 @@ const GuestDashboard = () => {
               <CRMTicketGaransi />
             </div>
           </div>
+        </section>
+
+        {/* SECTION: CUSTOM FURNITURE */}
+        <section id="custom-furniture" className="scroll-mt-32">
+          <CustomFurnitureForm />
         </section>
 
         {/* SECTION: KONTAK KAMI */}

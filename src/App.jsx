@@ -25,7 +25,7 @@ const MembershipAdmin = React.lazy(() => import("./pages/MembershipAdmin"));
 const WarrantyAdmin = React.lazy(() => import("./pages/WarrantyAdmin"));
 const User = React.lazy(() => import("./pages/User"));
 const ProductDetail = React.lazy(() => import("./pages/ProductDetail")); // Tambahkan ini
-const FiturBaru = React.lazy(() => import("./pages/FiturBaru"));
+const CustomFurnitureAdmin = React.lazy(() => import("./pages/CustomFurnitureAdmin"));
 const GuestDashboard = React.lazy(() => import("./pages/GuestDashboard"));
 const GuestLayout = React.lazy(() => import("./layouts/GuestLayout"));
 const Membership = React.lazy(() => import("./pages/Membership")); 
@@ -57,7 +57,7 @@ function App() {
             {/* Layout khusus Admin (Sidebar + Navigation) */}
             <Route element={<MainLayout />}>
               <Route path="/dashboard" element={<Dashboard />} />
-              <Route path="/fitur-baru" element={<FiturBaru />} />
+              <Route path="/custom-furniture" element={<CustomFurnitureAdmin />} />
               <Route path="/product" element={<Product />} />
               <Route path="/product/:id" element={<ProductDetail />} />
               <Route path="/chat" element={<Chat />} />

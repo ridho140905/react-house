@@ -1,15 +1,58 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import PageHeader from "../components/Page.Header";
-import { FaSearch, FaStar, FaCheck, FaTimes } from "react-icons/fa";
-import { reviewData } from "../data/reviewData";
+import { FaSearch, FaStar, FaCheck, FaTimes, FaSpinner } from "react-icons/fa";
+import { supabase } from "../lib/supabaseClient";
 
 export default function Review() {
   const [searchTerm, setSearchTerm] = useState("");
   const [filterStatus, setFilterStatus] = useState("All");
+  const [reviews, setReviews] = useState([]);
+  const [loading, setLoading] = useState(true);
 
-  const filteredReviews = reviewData.filter(rev => {
-    const matchesSearch = rev.name.toLowerCase().includes(searchTerm.toLowerCase()) || 
-                          rev.product.toLowerCase().includes(searchTerm.toLowerCase());
+  const fetchReviews = async () => {
+    try {
+      setLoading(true);
+      const { data, error } = await supabase.from('reviews').select('*').order('created_at', { ascending: false });
+      if (error) throw error;
+      setReviews(data || []);
+    } catch (error) {
+      console.error("Error fetching reviews:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchReviews();
+  }, []);
+
+  const handleApprove = async (id) => {
+    if(window.confirm("Setujui ulasan ini?")) {
+      try {
+        const { error } = await supabase.rpc('update_review_status', { p_id: id, p_status: 'Approved' });
+        if (error) throw error;
+        setReviews(reviews.map(r => r.id === id ? { ...r, status: 'Approved' } : r));
+      } catch (error) {
+        alert("Gagal menyetujui ulasan: " + error.message);
+      }
+    }
+  };
+
+  const handleDelete = async (id) => {
+    if(window.confirm("Hapus ulasan ini?")) {
+      try {
+        const { error } = await supabase.rpc('delete_review', { p_id: id });
+        if (error) throw error;
+        setReviews(reviews.filter(r => r.id !== id));
+      } catch (error) {
+        alert("Gagal menghapus ulasan: " + error.message);
+      }
+    }
+  };
+
+  const filteredReviews = reviews.filter(rev => {
+    const matchesSearch = (rev.name || "").toLowerCase().includes(searchTerm.toLowerCase()) || 
+                          (rev.product || "").toLowerCase().includes(searchTerm.toLowerCase());
     const matchesFilter = filterStatus === "All" || rev.status === filterStatus;
     return matchesSearch && matchesFilter;
   });
@@ -49,7 +92,12 @@ export default function Review() {
 
       {/* Grid Review */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-6">
-        {filteredReviews.length > 0 ? (
+        {loading ? (
+          <div className="col-span-2 py-16 flex flex-col items-center justify-center text-gray-400">
+            <FaSpinner className="animate-spin text-purple-600 mb-2" size={24} />
+            <p>Memuat data ulasan...</p>
+          </div>
+        ) : filteredReviews.length > 0 ? (
           filteredReviews.map((item) => (
             <div
               key={item.id}
@@ -60,7 +108,9 @@ export default function Review() {
                 <div className="flex justify-between items-center mb-3">
                   <div>
                     <h4 className="font-bold text-gray-800 text-sm">{item.name}</h4>
-                    <p className="text-xs text-gray-400">{item.date}</p>
+                    <p className="text-xs text-gray-400">
+                      {item.created_at ? new Date(item.created_at).toLocaleDateString('id-ID') : '-'}
+                    </p>
                   </div>
                   <span className={`px-2.5 py-1 text-[10px] font-bold rounded-lg ${
                     item.status === 'Approved' ? 'bg-green-100 text-green-600' : 'bg-orange-100 text-orange-500'
@@ -71,7 +121,7 @@ export default function Review() {
 
                 {/* Product Name */}
                 <div className="text-xs text-gray-500 mb-2">
-                  Produk: <span className="text-purple-600 font-semibold">{item.product}</span>
+                  Produk: <span className="text-purple-600 font-semibold">{item.product || 'Umum'}</span>
                 </div>
 
                 {/* Rating Bintang */}
@@ -94,11 +144,17 @@ export default function Review() {
               {/* Tombol Aksi */}
               <div className="flex justify-end space-x-2 mt-5 pt-3 border-t border-gray-100">
                 {item.status === 'Pending' && (
-                  <button className="px-3 py-1 bg-green-50 text-green-600 text-xs font-semibold rounded-lg hover:bg-green-100 transition-colors flex items-center gap-1">
+                  <button 
+                    onClick={() => handleApprove(item.id)}
+                    className="px-3 py-1 bg-green-50 text-green-600 text-xs font-semibold rounded-lg hover:bg-green-100 transition-colors flex items-center gap-1"
+                  >
                     <FaCheck size={12} /> Approve
                   </button>
                 )}
-                <button className="px-3 py-1 bg-red-50 text-red-500 text-xs font-semibold rounded-lg hover:bg-red-100 transition-colors flex items-center gap-1">
+                <button 
+                  onClick={() => handleDelete(item.id)}
+                  className="px-3 py-1 bg-red-50 text-red-500 text-xs font-semibold rounded-lg hover:bg-red-100 transition-colors flex items-center gap-1"
+                >
                   <FaTimes size={12} /> Hapus
                 </button>
               </div>

@@ -2,7 +2,7 @@ import React, { useEffect } from 'react';
 import { LogOut, LogIn, UserPlus, Gift } from 'lucide-react';
 import { useNavigate, Link } from 'react-router-dom';
 import ProfilePhoto from '../../assets/foto.jpeg'; 
-import LogoImage from '../../assets/logoproject.png';
+import LogoImage from '../../assets/logo FurnitureQ.png';
 import { useAuth } from '../../contexts/AuthContext';
 
 const GuestNavigation = () => {
@@ -56,7 +56,9 @@ const GuestNavigation = () => {
               className="flex items-center gap-2 px-4 py-2 bg-[#F4F2FF] text-[#4F45B6] rounded-xl hover:bg-[#EBE9FE] transition-colors font-bold text-sm mr-2"
             >
               <Gift className="w-4 h-4" strokeWidth={2.5} />
-              <span className="hidden lg:inline">Ke Dashboard</span>
+              <span className="hidden lg:inline">
+                {profile?.role === 'admin' ? "Ke Admin Dashboard" : "Ke Member Dashboard"}
+              </span>
             </Link>
 
             <div className="flex items-center gap-3 text-right">

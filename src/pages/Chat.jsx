@@ -1,59 +1,126 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useMemo } from "react";
 import PageHeader from "../components/Page.Header";
 import { FaPaperPlane, FaSearch } from "react-icons/fa";
+import { supabase } from "../lib/supabaseClient";
 
 export default function Chat() {
-  // --- PENERAPAN HOOKS SESUAI TUGAS ---
-  
-  // 1. useState
-  const [activeChat, setActiveChat] = useState(1);
+  const [activeChat, setActiveChat] = useState(null);
   const [messageText, setMessageText] = useState("");
-  const [messages, setMessages] = useState([
-    { id: 1, chatId: 1, sender: "user", text: "Halo admin, apakah model kursi stool ready?" },
-    { id: 2, chatId: 1, sender: "admin", text: "Halo! Iya, barangnya ready siap dikirim ya." },
-    { id: 3, chatId: 2, sender: "user", text: "Terima kasih barangnya sudah sampai" },
-    { id: 4, chatId: 3, sender: "user", text: "Kapan restock standing lamp?" },
-  ]);
+  const [messages, setMessages] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
 
-  // 2. useRef
   const chatEndRef = useRef(null);
   const inputRef = useRef(null);
 
-  // 3. useEffect
+  const fetchMessages = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('messages')
+        .select('*')
+        .order('created_at', { ascending: true });
+        
+      if (error) throw error;
+      setMessages(data || []);
+      
+      // Jika belum ada chat yang aktif dan ada pesan, set chat pertama sebagai aktif
+      if (!activeChat && data && data.length > 0) {
+        const firstEmail = data[data.length - 1].email; // Ambil pesan terbaru
+        setActiveChat(firstEmail);
+      }
+    } catch (error) {
+      console.error('Error fetching messages:', error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   useEffect(() => {
-    // Scroll ke pesan terbawah saat daftar pesan berubah atau ganti kontak
+    fetchMessages();
+
+    // Subscribe to realtime changes
+    const channel = supabase
+      .channel('public:messages')
+      .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'messages' }, (payload) => {
+        setMessages((prev) => [...prev, payload.new]);
+      })
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, []);
+
+  useEffect(() => {
     chatEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages, activeChat]);
 
   useEffect(() => {
-    // Auto fokus ke input saat ganti kontak chat
     inputRef.current?.focus();
   }, [activeChat]);
 
-  const handleSendMessage = () => {
-    if (messageText.trim() === "") return;
-    const newMsg = {
-      id: Date.now(),
-      chatId: activeChat,
-      sender: "admin", // Admin yang membalas
-      text: messageText,
-    };
-    setMessages(prev => [...prev, newMsg]);
-    setMessageText(""); // Reset input
+  const handleSendMessage = async () => {
+    if (messageText.trim() === "" || !activeChat) return;
+    
+    const textToSend = messageText;
+    setMessageText(""); // Optimistic reset
+    
+    try {
+      const { data, error } = await supabase.from('messages').insert([
+        {
+          email: activeChat,
+          name: 'Admin',
+          message: textToSend,
+          sender: 'admin'
+        }
+      ]).select();
+      
+      if (error) throw error;
+
+      // Tambahkan langsung ke state agar instan, berjaga-jaga jika Supabase realtime belum diaktifkan
+      if (data && data.length > 0) {
+        setMessages(prev => {
+          if (prev.find(m => m.id === data[0].id)) return prev;
+          return [...prev, data[0]];
+        });
+      }
+    } catch (error) {
+      console.error("Error sending message:", error);
+      alert("Gagal mengirim pesan.");
+    }
   };
 
-  const chatList = [
-    { id: 1, name: "Rizky Ridho", time: "10:35 AM", lastMsg: "Apakah meja ready?", avatar: "https://i.pravatar.cc/150?img=11" },
-    { id: 2, name: "Siti Aminah", time: "09:12 AM", lastMsg: "Terima kasih barangnya sudah sampai", avatar: "https://i.pravatar.cc/150?img=5" },
-    { id: 3, name: "Budi Santoso", time: "Yesterday", lastMsg: "Kapan restock standing lamp?", avatar: "https://i.pravatar.cc/150?img=13" },
-  ];
+  // Mengelompokkan pesan berdasarkan email
+  const chatList = useMemo(() => {
+    const grouped = {};
+    messages.forEach(msg => {
+      const email = msg.email;
+      if (!grouped[email]) {
+        grouped[email] = {
+          email: email,
+          name: msg.name || 'Unknown',
+          time: new Date(msg.created_at).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}),
+          lastMsg: msg.message,
+          timestamp: new Date(msg.created_at).getTime(),
+          avatar: `https://ui-avatars.com/api/?name=${encodeURIComponent(msg.name || email)}&background=F4F2FF&color=4F45B6`
+        };
+      } else {
+        if (new Date(msg.created_at).getTime() > grouped[email].timestamp) {
+          grouped[email].lastMsg = msg.message;
+          grouped[email].time = new Date(msg.created_at).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+          grouped[email].timestamp = new Date(msg.created_at).getTime();
+          if (msg.sender === 'user' && msg.name) {
+             grouped[email].name = msg.name;
+          }
+        }
+      }
+    });
+    return Object.values(grouped).sort((a,b) => b.timestamp - a.timestamp);
+  }, [messages]);
 
-  // Filter pesan yang sesuai dengan chat aktif
-  const currentMessages = messages.filter(msg => msg.chatId === activeChat);
+  const currentMessages = messages.filter(msg => msg.email === activeChat);
 
   return (
     <div>
-      {/* Menggunakan PageHeader agar sesuai dengan layout */}
       <PageHeader title="Chat" breadcrumb={["Chat"]} />
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 h-[72vh]">
@@ -69,12 +136,16 @@ export default function Chat() {
           </div>
           
           <div className="flex-1 overflow-y-auto space-y-2">
-            {chatList.map((item) => (
+            {isLoading ? (
+              <div className="text-center text-sm text-gray-400 mt-4">Loading chats...</div>
+            ) : chatList.length === 0 ? (
+              <div className="text-center text-sm text-gray-400 mt-4">Belum ada pesan masuk.</div>
+            ) : chatList.map((item) => (
               <div 
-                key={item.id}
-                onClick={() => setActiveChat(item.id)}
+                key={item.email}
+                onClick={() => setActiveChat(item.email)}
                 className={`flex items-center space-x-3 p-3 rounded-xl cursor-pointer transition-all ${
-                  activeChat === item.id ? "bg-purple-50 border border-purple-200" : "hover:bg-gray-50 border border-transparent"
+                  activeChat === item.email ? "bg-purple-50 border border-purple-200" : "hover:bg-gray-50 border border-transparent"
                 }`}
               >
                 <img src={item.avatar} alt="Avatar" className="w-10 h-10 rounded-full bg-gray-100 object-cover" />
@@ -92,56 +163,63 @@ export default function Chat() {
 
         {/* Kolom Kanan: Ruang Obrolan */}
         <div className="md:col-span-2 bg-white rounded-2xl p-6 shadow-sm border border-gray-50 flex flex-col justify-between h-full">
-          {/* Chat Header */}
-          <div className="flex items-center space-x-3 pb-4 border-b border-gray-50">
-            <img 
-              src={chatList.find(c => c.id === activeChat)?.avatar || ""} 
-              alt="Avatar" 
-              className="w-10 h-10 rounded-full object-cover bg-gray-100" 
-            />
-            <div>
-              <h3 className="font-semibold text-gray-800 text-sm">
-                {chatList.find(c => c.id === activeChat)?.name}
-              </h3>
-              <span className="text-xs text-green-500 font-medium">Online</span>
-            </div>
-          </div>
-
-          {/* Chat Bubbles Area */}
-          <div className="flex-1 overflow-y-auto py-6 space-y-4 pr-2">
-            {currentMessages.map((msg) => (
-              <div key={msg.id} className={`flex ${msg.sender === "admin" ? "justify-end" : "justify-start"}`}>
-                <div className={`p-3 rounded-2xl max-w-xs text-sm shadow-sm ${
-                  msg.sender === "admin" 
-                    ? "bg-purple-600 text-white" 
-                    : "bg-gray-50 text-gray-800 border border-gray-100"
-                }`}>
-                  {msg.text}
+          {activeChat ? (
+            <>
+              {/* Chat Header */}
+              <div className="flex items-center space-x-3 pb-4 border-b border-gray-50">
+                <img 
+                  src={chatList.find(c => c.email === activeChat)?.avatar || ""} 
+                  alt="Avatar" 
+                  className="w-10 h-10 rounded-full object-cover bg-gray-100" 
+                />
+                <div>
+                  <h3 className="font-semibold text-gray-800 text-sm">
+                    {chatList.find(c => c.email === activeChat)?.name}
+                  </h3>
+                  <span className="text-xs text-green-500 font-medium">Online</span>
                 </div>
               </div>
-            ))}
-            {/* Elemen kosong untuk scroll tujuan useRef */}
-            <div ref={chatEndRef} />
-          </div>
 
-          {/* Chat Input */}
-          <div className="flex items-center space-x-3 pt-4 border-t border-gray-50">
-            <input 
-              ref={inputRef} // Pasang useRef di sini
-              type="text" 
-              placeholder="Type a message..." 
-              value={messageText}
-              onChange={(e) => setMessageText(e.target.value)}
-              onKeyDown={(e) => e.key === 'Enter' && handleSendMessage()}
-              className="flex-1 px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm outline-none focus:border-purple-500"
-            />
-            <button 
-              onClick={handleSendMessage}
-              className="p-2.5 bg-purple-600 text-white rounded-xl hover:bg-purple-700 transition-colors shadow-sm"
-            >
-              <FaPaperPlane />
-            </button>
-          </div>
+              {/* Chat Bubbles Area */}
+              <div className="flex-1 overflow-y-auto py-6 space-y-4 pr-2">
+                {currentMessages.map((msg) => (
+                  <div key={msg.id} className={`flex ${msg.sender === "admin" ? "justify-end" : "justify-start"}`}>
+                    <div className={`p-3 rounded-2xl max-w-xs md:max-w-md text-sm shadow-sm ${
+                      msg.sender === "admin" 
+                        ? "bg-purple-600 text-white" 
+                        : "bg-gray-50 text-gray-800 border border-gray-100"
+                    }`}>
+                      {msg.message}
+                    </div>
+                  </div>
+                ))}
+                <div ref={chatEndRef} />
+              </div>
+
+              {/* Chat Input */}
+              <div className="flex items-center space-x-3 pt-4 border-t border-gray-50">
+                <input 
+                  ref={inputRef}
+                  type="text" 
+                  placeholder="Ketik balasan..." 
+                  value={messageText}
+                  onChange={(e) => setMessageText(e.target.value)}
+                  onKeyDown={(e) => e.key === 'Enter' && handleSendMessage()}
+                  className="flex-1 px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm outline-none focus:border-purple-500"
+                />
+                <button 
+                  onClick={handleSendMessage}
+                  className="p-2.5 bg-purple-600 text-white rounded-xl hover:bg-purple-700 transition-colors shadow-sm"
+                >
+                  <FaPaperPlane />
+                </button>
+              </div>
+            </>
+          ) : (
+            <div className="flex-1 flex items-center justify-center text-gray-400">
+              Pilih kontak untuk memulai obrolan
+            </div>
+          )}
         </div>
       </div>
     </div>

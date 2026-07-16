@@ -1,6 +1,6 @@
 import React, { useContext } from 'react';
 import { Home, ShoppingBag, Award, Wrench } from 'lucide-react';
-import LogoImage from '../../assets/logoproject.png'; 
+import LogoImage from '../../assets/logo FurnitureQ.png'; 
 import { GuestContext } from '../../layouts/GuestLayout';
 
 const EXACT_THEME_COLOR = "#4F45B6";

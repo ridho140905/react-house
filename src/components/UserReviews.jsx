@@ -1,16 +1,38 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { FiStar, FiArrowRight } from "react-icons/fi";
-import { reviewData } from "../data/reviewData";
+import { supabase } from "../lib/supabaseClient";
 
 const UserReviews = () => {
-  const reviews = reviewData.filter(rev => rev.status === "Approved").slice(0, 3);
+  const [reviews, setReviews] = useState([]);
+
+  useEffect(() => {
+    const fetchReviews = async () => {
+      try {
+        const { data, error } = await supabase
+          .from('reviews')
+          .select('*')
+          .eq('status', 'Approved')
+          .order('created_at', { ascending: false })
+          .limit(3);
+          
+        if (error) throw error;
+        setReviews(data || []);
+      } catch (error) {
+        console.error("Error fetching reviews:", error);
+      }
+    };
+    
+    fetchReviews();
+  }, []);
+
+  const approvedReviews = reviews;
 
   return (
     <section className="mt-8">
       <h3 className="text-lg font-bold text-gray-800 mb-4">User Reviews</h3>
       <div className="flex items-center gap-4">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 flex-1 items-stretch">
-          {reviews.map((rev, idx) => (
+          {approvedReviews.map((rev, idx) => (
             <div
               key={idx}
               className="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm flex flex-col h-full justify-between"
